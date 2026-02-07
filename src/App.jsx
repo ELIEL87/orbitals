@@ -65,15 +65,15 @@ function App() {
         return;
       }
 
-      // Handle arrow keys for navigation
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        navigateHex('next');
-        e.preventDefault();
-        return;
-      }
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        navigateHex('prev');
+      // Handle arrow keys for spatial navigation
+      const arrowMap = {
+        ArrowUp: 'up',
+        ArrowDown: 'down',
+        ArrowLeft: 'left',
+        ArrowRight: 'right',
+      };
+      if (arrowMap[e.key]) {
+        navigateHex(arrowMap[e.key]);
         e.preventDefault();
         return;
       }

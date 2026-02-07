@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { getOrbit, hexDistance } from '../utils/hexagon';
+import { getOrbit, hexDistance, hexToPixel } from '../utils/hexagon';
 
 export function useGame(initialCenters = [], blackHexagons = []) {
   const [centers] = useState(initialCenters);
@@ -424,39 +424,56 @@ export function useGame(initialCenters = [], blackHexagons = []) {
     return playableHexes;
   }, [centers, grid]);
 
-  // Navigate to next/previous hexagon
+  // Navigate to the nearest playable hexagon in a spatial direction
   const navigateHex = useCallback((direction) => {
     const playableHexes = getPlayableHexagons();
     if (playableHexes.length === 0) return;
-    
+
     if (!selectedHex) {
-      // If nothing selected, select first hexagon
       setSelectedHex(playableHexes[0]);
       return;
     }
-    
-    // Find current index
-    const currentIndex = playableHexes.findIndex(
-      h => h.q === selectedHex.q && h.r === selectedHex.r
-    );
-    
-    if (currentIndex === -1) {
-      // Current selection not in playable hexes, select first
-      setSelectedHex(playableHexes[0]);
-      return;
+
+    // Direction vectors in pixel space
+    const dirVectors = {
+      up:    { x:  0, y: -1 },
+      down:  { x:  0, y:  1 },
+      left:  { x: -1, y:  0 },
+      right: { x:  1, y:  0 },
+    };
+    const dir = dirVectors[direction];
+    if (!dir) return;
+
+    const current = hexToPixel(selectedHex.q, selectedHex.r);
+
+    let best = null;
+    let bestScore = Infinity;
+
+    playableHexes.forEach(h => {
+      if (h.q === selectedHex.q && h.r === selectedHex.r) return;
+      const pos = hexToPixel(h.q, h.r);
+      const dx = pos.x - current.x;
+      const dy = pos.y - current.y;
+
+      // How far along the desired direction (must be positive)
+      const parallel = dx * dir.x + dy * dir.y;
+      if (parallel <= 0) return; // wrong direction or exactly perpendicular
+
+      // How far off-axis
+      const perpendicular = Math.abs(dx * dir.y - dy * dir.x);
+
+      // Score: prefer close & aligned; penalize off-axis heavily
+      const score = parallel + 3 * perpendicular;
+
+      if (score < bestScore) {
+        bestScore = score;
+        best = h;
+      }
+    });
+
+    if (best) {
+      setSelectedHex(best);
     }
-    
-    // Navigate based on direction
-    let newIndex;
-    if (direction === 'next') {
-      newIndex = (currentIndex + 1) % playableHexes.length;
-    } else if (direction === 'prev') {
-      newIndex = (currentIndex - 1 + playableHexes.length) % playableHexes.length;
-    } else {
-      return;
-    }
-    
-    setSelectedHex(playableHexes[newIndex]);
   }, [selectedHex, getPlayableHexagons]);
 
   return {
