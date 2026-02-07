@@ -43,23 +43,12 @@ body {
   display: flex;
   gap: 30px;
   justify-content: center;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  flex-direction: row;
-}
-
-.instructions {
-  order: 1;
-  background: #f8f8f8;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(74, 66, 56, 0.2);
-  min-width: 300px;
-  max-width: 400px;
+  align-items: stretch;
 }
 
 .game-board-wrapper {
-  order: 2;
+  flex: 2;
+  min-width: 0;
 }
 
 .game-board {
@@ -67,20 +56,29 @@ body {
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(74, 66, 56, 0.2);
-  min-width: 600px;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 
 .game-controls {
-  order: 3;
+  flex: 1;
   background: #f8f8f8;
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(74, 66, 56, 0.2);
-  min-width: 300px;
-  max-width: 400px;
+}
+
+.instructions {
+  background: #f8f8f8;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(74, 66, 56, 0.2);
+  margin-top: 30px;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .instructions h3 {
@@ -299,31 +297,12 @@ body {
 
 /* Rotation animation — orbital motion is handled via SVG transforms */
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .game-container {
     flex-direction: column;
-    align-items: center;
-  }
-
-  .instructions {
-    order: 1;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .game-board-wrapper {
-    order: 2;
-    width: 100%;
   }
 
   .game-board {
     min-width: auto;
-    width: 100%;
-  }
-
-  .game-controls {
-    width: 100%;
-    max-width: 100%;
-    order: 3;
   }
 }

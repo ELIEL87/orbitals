@@ -111,21 +111,8 @@ function App() {
       </header>
 
       <div className="game-container">
-        <div className="instructions">
-          <h3>How to Play</h3>
-          <ul>
-            <li>Click a hexagon or use arrow keys to select it</li>
-            <li>Type a number (0-9)</li>
-            <li>Press Backspace/Delete to clear a hexagon</li>
-            <li>Arrow keys (↑↓←→) to navigate between hexagons</li>
-            <li>Each number can only appear once per orbit</li>
-            <li>Click the center hexagon to rotate its orbit</li>
-            <li>Sum of numbers in each orbit must equal the center number</li>
-          </ul>
-        </div>
-
         <div className="game-board-wrapper">
-          <div 
+          <div
             className="game-board"
             onClick={(e) => {
               // If clicking on the game board container (not on SVG), deselect
@@ -196,6 +183,19 @@ function App() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="instructions">
+        <h3>How to Play</h3>
+        <ul>
+          <li>Click a hexagon or use arrow keys to select it</li>
+          <li>Type a number (0-9)</li>
+          <li>Press Backspace/Delete to clear a hexagon</li>
+          <li>Arrow keys (↑↓←→) to navigate between hexagons</li>
+          <li>Each number can only appear once per orbit</li>
+          <li>Click the center hexagon to rotate its orbit</li>
+          <li>Sum of numbers in each orbit must equal the center number</li>
+        </ul>
       </div>
     </div>
   );
