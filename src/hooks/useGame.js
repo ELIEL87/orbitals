@@ -229,27 +229,6 @@ export function useGame(initialCenters = [], blackHexagons = []) {
                 orbitIndex: index,
                 isRotating: false,
               };
-              
-              // Remove from source position if it moved
-              if (sourceKey !== targetKey) {
-                // Check if source position is still needed by other orbits
-                const sourceOrbitCenters = sourceData.orbitCenters || [];
-                const stillNeeded = sourceOrbitCenters.some(oc => 
-                  !(oc.q === orbitCenter.q && oc.r === orbitCenter.r)
-                );
-                
-                if (!stillNeeded && !sourceData.isCenter) {
-                  delete newGrid[sourceKey];
-                } else if (stillNeeded) {
-                  // Update source to remove this orbit
-                  newGrid[sourceKey] = {
-                    ...sourceData,
-                    orbitCenters: sourceOrbitCenters.filter(oc => 
-                      !(oc.q === orbitCenter.q && oc.r === orbitCenter.r)
-                    ),
-                  };
-                }
-              }
             }
           });
           
