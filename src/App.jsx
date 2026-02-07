@@ -33,6 +33,7 @@ function App() {
     getAvailableNumbers,
     hasDuplicates,
     rotationAngles,
+    rotatingOrbit,
     isOrbitIncorrect,
     isOrbitCorrect,
     navigateHex,
@@ -141,6 +142,7 @@ function App() {
               onHexRotate={handleRotate}
               hasDuplicates={hasDuplicates}
               rotationAngles={rotationAngles}
+              rotatingOrbit={rotatingOrbit}
               isOrbitIncorrect={isOrbitIncorrect}
               isOrbitCorrect={isOrbitCorrect}
               hoveredHex={hoveredHex}

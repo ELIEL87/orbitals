@@ -10,6 +10,7 @@ export default function HexagonGrid({
   onHexRotate,
   hasDuplicates,
   rotationAngles = {},
+  rotatingOrbit = null,
   isOrbitIncorrect,
   isOrbitCorrect,
   hoveredHex = null,
@@ -162,12 +163,15 @@ export default function HexagonGrid({
           isInCorrectOrbit = false;
         }
         
-        // Get orbit center position for rotation animation (use first orbit)
+        // Get orbit center position for rotation animation
+        // Use the currently rotating orbit as pivot (not just the first orbit)
         let orbitCenterPos = null;
-        if (hexData?.orbitCenters && hexData.orbitCenters.length > 0 && !isCenter) {
-          const firstOrbit = hexData.orbitCenters[0];
-          const centerPos = hexToPixel(firstOrbit.q, firstOrbit.r);
-          orbitCenterPos = centerPos;
+        if (isRotating && rotatingOrbit && hexData?.orbitCenters && !isCenter) {
+          const [rq, rr] = rotatingOrbit.split(',').map(Number);
+          const isInRotatingOrbit = hexData.orbitCenters.some(oc => oc.q === rq && oc.r === rr);
+          if (isInRotatingOrbit) {
+            orbitCenterPos = hexToPixel(rq, rr);
+          }
         }
         
         return (

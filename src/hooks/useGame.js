@@ -153,14 +153,17 @@ export function useGame(initialCenters = [], blackHexagons = []) {
     });
     setRotationAngles(prev => ({ ...prev, ...newAngles }));
     
-    // Animate rotation
+    // Animate rotation with ease-in-out
     const startTime = Date.now();
-    const duration = 1200; // Slower rotation (1.2 seconds)
-    
+    const duration = 700;
+
+    // Ease-in-out cubic
+    const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const angle = progress * 60; // Rotate 60 degrees (one hexagon position)
+      const angle = ease(progress) * 60; // Rotate 60 degrees (one hexagon position)
       
       const currentAngles = {};
       orbit1.forEach(h => {
@@ -469,6 +472,7 @@ export function useGame(initialCenters = [], blackHexagons = []) {
     getAvailableNumbers,
     hasDuplicates,
     rotationAngles,
+    rotatingOrbit,
     isOrbitIncorrect,
     isOrbitCorrect,
     getOrbitSum,

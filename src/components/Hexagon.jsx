@@ -157,8 +157,8 @@ export default function Hexagon({
       style={{ cursor: isBlack ? 'not-allowed' : 'pointer' }}
     >
       {isRotating && rotationOffset ? (
-        // Animated rotation: translate to orbit center, rotate, translate by offset
-        <g transform={`translate(${orbitCenterPos.x}, ${orbitCenterPos.y}) rotate(${rotationAngle}) translate(${rotationOffset.dx}, ${rotationOffset.dy})`}>
+        // Animated rotation: orbit around center, counter-rotate content to stay upright
+        <g transform={`translate(${orbitCenterPos.x}, ${orbitCenterPos.y}) rotate(${rotationAngle}) translate(${rotationOffset.dx}, ${rotationOffset.dy}) rotate(${-rotationAngle})`}>
           {renderContent()}
         </g>
       ) : (
