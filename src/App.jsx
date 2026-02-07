@@ -1,35 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import HexagonGrid from './components/HexagonGrid';
+import ModeSelector from './components/ModeSelector';
 import { useGame } from './hooks/useGame';
+import { generateDailyPuzzle, generateFreePlayPuzzle } from './utils/puzzleGenerator';
 import './App.css';
 
-// Sample game configuration - centers with target numbers
-// Positioned so orbits overlap and share hexagons
-// Centers are at least distance 2 apart (at least 1 hexagon between them)
-// Distance 2 means orbits (radius 1) will share hexagons
-const INITIAL_CENTERS = [
-  { q: 0, r: 0, target: 15 },
-  { q: 2, r: 0, target: 20 },  // Distance 2 from (0,0) - orbits will share
-  { q: 1, r: 2, target: 18 },   // Distance 3 from (0,0), distance 2 from (2,0)
-];
-
-// Black hexagon positions (unfillable hexagons that don't count toward sums)
-// Format: array of {q, r} coordinates
-const BLACK_HEXAGONS = [
-  { q: 1, r: 0 },  // Black hexagon shared between center 1 and center 2 orbits
-];
-
-function App() {
+function Game({ centers, blackHexagons }) {
   const {
     grid,
     selectedHex,
-    centers,
+    centers: gameCenters,
     initializeGrid,
     handleHexClick,
     handleNumberInput,
     handleRotate,
     checkWin,
-    isComplete,
     getAvailableNumbers,
     hasDuplicates,
     rotationAngles,
@@ -37,35 +22,25 @@ function App() {
     isOrbitIncorrect,
     isOrbitCorrect,
     navigateHex,
-  } = useGame(INITIAL_CENTERS, BLACK_HEXAGONS);
+  } = useGame(centers, blackHexagons);
 
   const [hoveredHex, setHoveredHex] = useState(null);
-
   const [gameWon, setGameWon] = useState(false);
-  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     initializeGrid();
   }, [initializeGrid]);
 
   useEffect(() => {
-    // Check if all orbits are correct (all green)
-    if (checkWin()) {
-      setGameWon(true);
-    } else {
-      setGameWon(false);
-    }
+    setGameWon(checkWin());
   }, [checkWin, grid]);
 
-  // Handle keyboard input
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Don't handle if user is typing in an input field
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return;
       }
 
-      // Handle arrow keys for spatial navigation
       const arrowMap = {
         ArrowUp: 'up',
         ArrowDown: 'down',
@@ -78,7 +53,6 @@ function App() {
         return;
       }
 
-      // Handle number keys (0-9)
       if (e.key >= '0' && e.key <= '9') {
         const number = parseInt(e.key, 10);
         if (selectedHex) {
@@ -89,8 +63,7 @@ function App() {
         }
         e.preventDefault();
       }
-      
-      // Handle backspace/delete to clear
+
       if ((e.key === 'Backspace' || e.key === 'Delete') && selectedHex) {
         handleNumberInput(null);
         e.preventDefault();
@@ -98,24 +71,16 @@ function App() {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedHex, handleNumberInput, getAvailableNumbers, navigateHex]);
 
   return (
-    <div className="app">
-      <header className="header">
-        <h1>Orbitals</h1>
-        <p className="subtitle">Fill the orbits to match the center numbers</p>
-      </header>
-
+    <>
       <div className="game-container">
         <div className="game-board-wrapper">
           <div
             className="game-board"
             onClick={(e) => {
-              // If clicking on the game board container (not on SVG), deselect
               if (e.target === e.currentTarget || e.target.className === 'game-board') {
                 handleHexClick(null, null);
               }
@@ -123,7 +88,7 @@ function App() {
           >
             <HexagonGrid
               grid={grid}
-              centers={centers}
+              centers={gameCenters}
               selectedHex={selectedHex}
               onHexClick={handleHexClick}
               onHexRotate={handleRotate}
@@ -178,7 +143,7 @@ function App() {
 
           {gameWon && (
             <div className="win-message">
-              <h2>✅ Solved!</h2>
+              <h2>Solved!</h2>
               <p>All orbits are correctly filled!</p>
             </div>
           )}
@@ -192,13 +157,78 @@ function App() {
             <li>Click a hexagon or use arrow keys to select it</li>
             <li>Type a number (0-9)</li>
             <li>Press Backspace/Delete to clear a hexagon</li>
-            <li>Arrow keys (↑↓←→) to navigate between hexagons</li>
+            <li>Arrow keys to navigate between hexagons</li>
             <li>Each number can only appear once per orbit</li>
             <li>Click the center hexagon to rotate its orbit</li>
             <li>Sum of numbers in each orbit must equal the center number</li>
           </ul>
         </div>
       </div>
+    </>
+  );
+}
+
+function getTodayString() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function App() {
+  const [mode, setMode] = useState('daily');
+  const [difficulty, setDifficulty] = useState('medium');
+  const [puzzleConfig, setPuzzleConfig] = useState(null);
+  const [puzzleKey, setPuzzleKey] = useState(0);
+
+  const generatePuzzle = useCallback((currentMode, currentDifficulty) => {
+    if (currentMode === 'daily') {
+      return generateDailyPuzzle(getTodayString());
+    }
+    return generateFreePlayPuzzle(currentDifficulty);
+  }, []);
+
+  useEffect(() => {
+    setPuzzleConfig(generatePuzzle(mode, difficulty));
+  }, [mode, difficulty, puzzleKey, generatePuzzle]);
+
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
+    setPuzzleKey(k => k + 1);
+  };
+
+  const handleDifficultyChange = (newDifficulty) => {
+    setDifficulty(newDifficulty);
+    setPuzzleKey(k => k + 1);
+  };
+
+  const handleNewPuzzle = () => {
+    setPuzzleKey(k => k + 1);
+  };
+
+  if (!puzzleConfig) return null;
+
+  return (
+    <div className="app">
+      <header className="header">
+        <h1>Orbitals</h1>
+        <p className="subtitle">Fill the orbits to match the center numbers</p>
+      </header>
+
+      <ModeSelector
+        mode={mode}
+        difficulty={difficulty}
+        onModeChange={handleModeChange}
+        onDifficultyChange={handleDifficultyChange}
+        onNewPuzzle={handleNewPuzzle}
+      />
+
+      <Game
+        key={puzzleKey}
+        centers={puzzleConfig.centers}
+        blackHexagons={puzzleConfig.blackHexagons}
+      />
     </div>
   );
 }

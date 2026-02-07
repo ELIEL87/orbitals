@@ -24,7 +24,7 @@ body {
 .header {
   text-align: center;
   color: white;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .header h1 {
@@ -39,6 +39,127 @@ body {
   opacity: 0.9;
 }
 
+/* Mode selector */
+.mode-selector {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.mode-tabs {
+  display: inline-flex;
+}
+
+.mode-tab {
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid #508484;
+  background: white;
+  color: #508484;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-tab:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.mode-tab:last-child {
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+}
+
+.mode-tab.active {
+  background: #508484;
+  color: white;
+}
+
+.mode-tab:hover:not(.active) {
+  background: rgba(80, 132, 132, 0.1);
+}
+
+.daily-date {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  margin-top: 10px;
+}
+
+.freeplay-controls {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.difficulty-selector {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.difficulty-btn {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.difficulty-btn.easy {
+  border-color: #79C99E;
+  color: #79C99E;
+}
+
+.difficulty-btn.easy.active {
+  background: #79C99E;
+  color: white;
+}
+
+.difficulty-btn.medium {
+  border-color: #508484;
+  color: #508484;
+}
+
+.difficulty-btn.medium.active {
+  background: #508484;
+  color: white;
+}
+
+.difficulty-btn.hard {
+  border-color: #4A4238;
+  color: #4A4238;
+}
+
+.difficulty-btn.hard.active {
+  background: #4A4238;
+  color: white;
+}
+
+.difficulty-btn:hover:not(.active) {
+  opacity: 0.7;
+}
+
+.new-puzzle-btn {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid #508484;
+  background: white;
+  color: #508484;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.new-puzzle-btn:hover {
+  background: #508484;
+  color: white;
+}
+
+/* Game layout */
 .game-container {
   display: flex;
   gap: 30px;
