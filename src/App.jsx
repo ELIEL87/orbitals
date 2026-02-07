@@ -185,17 +185,19 @@ function App() {
         </div>
       </div>
 
-      <div className="instructions">
-        <h3>How to Play</h3>
-        <ul>
-          <li>Click a hexagon or use arrow keys to select it</li>
-          <li>Type a number (0-9)</li>
-          <li>Press Backspace/Delete to clear a hexagon</li>
-          <li>Arrow keys (↑↓←→) to navigate between hexagons</li>
-          <li>Each number can only appear once per orbit</li>
-          <li>Click the center hexagon to rotate its orbit</li>
-          <li>Sum of numbers in each orbit must equal the center number</li>
-        </ul>
+      <div className="instructions-wrapper">
+        <div className="instructions">
+          <h3>How to Play</h3>
+          <ul>
+            <li>Click a hexagon or use arrow keys to select it</li>
+            <li>Type a number (0-9)</li>
+            <li>Press Backspace/Delete to clear a hexagon</li>
+            <li>Arrow keys (↑↓←→) to navigate between hexagons</li>
+            <li>Each number can only appear once per orbit</li>
+            <li>Click the center hexagon to rotate its orbit</li>
+            <li>Sum of numbers in each orbit must equal the center number</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
