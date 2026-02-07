@@ -45,6 +45,21 @@ body {
   justify-content: center;
   align-items: flex-start;
   flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.instructions {
+  order: 1;
+  background: #f8f8f8;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(74, 66, 56, 0.2);
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.game-board-wrapper {
+  order: 2;
 }
 
 .game-board {
@@ -59,16 +74,13 @@ body {
 }
 
 .game-controls {
+  order: 3;
   background: #f8f8f8;
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(74, 66, 56, 0.2);
   min-width: 300px;
   max-width: 400px;
-}
-
-.instructions {
-  margin-bottom: 30px;
 }
 
 .instructions h3 {
@@ -274,6 +286,17 @@ body {
   stroke-width: 2;
 }
 
+.hexagon.black polygon {
+  fill: #4A4238;
+  stroke: #2A2218;
+  stroke-width: 2;
+  opacity: 0.9;
+}
+
+.hexagon.black {
+  cursor: not-allowed;
+}
+
 /* Rotation animation */
 .hexagon.rotating .rotating-polygon {
   animation: pulseHexagon 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -313,6 +336,17 @@ body {
     align-items: center;
   }
 
+  .instructions {
+    order: 1;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .game-board-wrapper {
+    order: 2;
+    width: 100%;
+  }
+
   .game-board {
     min-width: auto;
     width: 100%;
@@ -321,5 +355,6 @@ body {
   .game-controls {
     width: 100%;
     max-width: 100%;
+    order: 3;
   }
 }

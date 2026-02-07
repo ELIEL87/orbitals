@@ -1,10 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
 import { getOrbit, hexDistance } from '../utils/hexagon';
 
-export function useGame(initialCenters = []) {
+export function useGame(initialCenters = [], blackHexagons = []) {
+  const [centers] = useState(initialCenters);
   const [grid, setGrid] = useState({});
   const [selectedHex, setSelectedHex] = useState(null);
-  const [centers] = useState(initialCenters);
+  const [blackHexSet] = useState(new Set(blackHexagons.map(bh => `${bh.q},${bh.r}`)));
   const [rotatingOrbit, setRotatingOrbit] = useState(null);
   const [rotationAngles, setRotationAngles] = useState({});
 
@@ -25,10 +26,13 @@ export function useGame(initialCenters = []) {
       const orbit1 = getOrbit(center.q, center.r, 1);
       orbit1.forEach((hex, index) => {
         const key = `${hex.q},${hex.r}`;
+        const isBlack = blackHexSet.has(key);
+        
         if (!newGrid[key]) {
           newGrid[key] = {
             value: null,
             isCenter: false,
+            isBlack: isBlack,
             rotation: 0,
             orbitCenters: [{ q: center.q, r: center.r }], // Array to support multiple orbits
             orbitIndex: index,
@@ -41,12 +45,16 @@ export function useGame(initialCenters = []) {
           if (!newGrid[key].orbitCenters.some(oc => oc.q === center.q && oc.r === center.r)) {
             newGrid[key].orbitCenters.push({ q: center.q, r: center.r });
           }
+          // Update black status if this orbit marks it as black
+          if (isBlack) {
+            newGrid[key].isBlack = true;
+          }
         }
       });
     });
     
     setGrid(newGrid);
-  }, [centers]);
+  }, [centers, blackHexSet]);
 
   const handleHexClick = useCallback((q, r) => {
     // If q and r are null, deselect
@@ -58,7 +66,8 @@ export function useGame(initialCenters = []) {
     const key = `${q},${r}`;
     const hex = grid[key];
     
-    if (!hex || hex.isCenter) {
+    // Don't allow selection of centers or black hexagons
+    if (!hex || hex.isCenter || hex.isBlack) {
       setSelectedHex(null);
       return;
     }
@@ -132,11 +141,15 @@ export function useGame(initialCenters = []) {
     // Get all hexes in the orbit
     const orbit1 = getOrbit(orbitCenter.q, orbitCenter.r, 1);
     
-    // Initialize rotation angles for animation
+    // Initialize rotation angles for animation (including black hexagons)
     const newAngles = {};
     orbit1.forEach(h => {
       const k = `${h.q},${h.r}`;
-      newAngles[k] = 0;
+      const hexData = grid[k];
+      // All hexagons rotate (including black)
+      if (hexData) {
+        newAngles[k] = 0;
+      }
     });
     setRotationAngles(prev => ({ ...prev, ...newAngles }));
     
@@ -152,34 +165,91 @@ export function useGame(initialCenters = []) {
       const currentAngles = {};
       orbit1.forEach(h => {
         const k = `${h.q},${h.r}`;
-        currentAngles[k] = angle;
+        const hexData = grid[k];
+        // All hexagons rotate (including black)
+        if (hexData) {
+          currentAngles[k] = angle;
+        }
       });
       setRotationAngles(prev => ({ ...prev, ...currentAngles }));
       
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        // Animation complete - update values
+        // Animation complete - move hexagons to new positions
         setGrid(prev => {
           const newGrid = { ...prev };
-          const orbitValues = orbit1.map(h => {
+          
+          // Get all hexagons currently in this orbit with their data
+          const orbitData = orbit1.map((h, index) => {
             const k = `${h.q},${h.r}`;
-            return prev[k]?.value ?? null;
+            const hexData = prev[k];
+            return {
+              sourceKey: k,
+              sourceQ: h.q,
+              sourceR: h.r,
+              value: hexData?.value ?? null,
+              isBlack: hexData?.isBlack ?? false,
+              orbitCenters: hexData?.orbitCenters ?? [],
+              rotation: hexData?.rotation ?? 0,
+            };
           });
           
-          // Rotate array counter-clockwise (shift left - first element moves to last)
-          // This matches counter-clockwise visual rotation
-          const rotated = [...orbitValues.slice(1), orbitValues[0]];
+          // Rotate array counter-clockwise (shift left) - each hexagon moves to next position
+          const rotated = [...orbitData.slice(1), orbitData[0]];
           
+          // Move each hexagon to its new position
           orbit1.forEach((h, index) => {
-            const k = `${h.q},${h.r}`;
-            if (newGrid[k]) {
-              newGrid[k] = {
-                ...newGrid[k],
-                value: rotated[index],
-                rotation: (newGrid[k].rotation + 1) % 6,
+            const targetKey = `${h.q},${h.r}`;
+            const sourceHex = rotated[index];
+            const sourceKey = sourceHex.sourceKey;
+            
+            // Get the hexagon data from source position
+            const sourceData = prev[sourceKey];
+            
+            if (sourceData) {
+              // Determine which orbits this position belongs to
+              const newOrbitCenters = [];
+              
+              // Check all centers to see if this position is in their orbit
+              centers.forEach(center => {
+                const centerOrbit = getOrbit(center.q, center.r, 1);
+                if (centerOrbit.some(hex => hex.q === h.q && hex.r === h.r)) {
+                  newOrbitCenters.push({ q: center.q, r: center.r });
+                }
+              });
+              
+              // Update or create hexagon at target position
+              newGrid[targetKey] = {
+                value: sourceHex.value,
+                isCenter: false,
+                isBlack: sourceHex.isBlack,
+                rotation: (sourceHex.rotation + 1) % 6,
+                orbitCenters: newOrbitCenters,
+                orbitIndex: index,
                 isRotating: false,
               };
+              
+              // Remove from source position if it moved
+              if (sourceKey !== targetKey) {
+                // Check if source position is still needed by other orbits
+                const sourceOrbitCenters = sourceData.orbitCenters || [];
+                const stillNeeded = sourceOrbitCenters.some(oc => 
+                  !(oc.q === orbitCenter.q && oc.r === orbitCenter.r)
+                );
+                
+                if (!stillNeeded && !sourceData.isCenter) {
+                  delete newGrid[sourceKey];
+                } else if (stillNeeded) {
+                  // Update source to remove this orbit
+                  newGrid[sourceKey] = {
+                    ...sourceData,
+                    orbitCenters: sourceOrbitCenters.filter(oc => 
+                      !(oc.q === orbitCenter.q && oc.r === orbitCenter.r)
+                    ),
+                  };
+                }
+              }
             }
           });
           
@@ -204,7 +274,7 @@ export function useGame(initialCenters = []) {
       }
     };
     
-    // Mark as rotating
+    // Mark as rotating (including black hexagons)
     setGrid(prev => {
       const newGrid = { ...prev };
       orbit1.forEach(h => {
@@ -222,34 +292,49 @@ export function useGame(initialCenters = []) {
     requestAnimationFrame(animate);
   }, [grid, rotatingOrbit]);
 
-  // Check if orbit has duplicate numbers
+  // Check if orbit has duplicate numbers (excluding black hexagons)
   const hasDuplicates = useCallback((orbitCenter) => {
     const orbit1 = getOrbit(orbitCenter.q, orbitCenter.r, 1);
     const values = orbit1
       .map(hex => {
         const key = `${hex.q},${hex.r}`;
-        return grid[key]?.value;
+        const hexData = grid[key];
+        // Skip black hexagons and centers
+        if (hexData?.isBlack || hexData?.isCenter) {
+          return null;
+        }
+        return hexData?.value;
       })
       .filter(v => v !== null);
     return new Set(values).size !== values.length;
   }, [grid]);
 
-  // Check if orbit sum matches target
+  // Check if orbit sum matches target (excluding black hexagons)
   const getOrbitSum = useCallback((orbitCenter) => {
     const orbit1 = getOrbit(orbitCenter.q, orbitCenter.r, 1);
     return orbit1.reduce((acc, hex) => {
       const key = `${hex.q},${hex.r}`;
-      const value = grid[key]?.value;
+      const hexData = grid[key];
+      // Skip black hexagons and centers
+      if (hexData?.isBlack || hexData?.isCenter) {
+        return acc;
+      }
+      const value = hexData?.value;
       return acc + (value !== null ? value : 0);
     }, 0);
   }, [grid]);
 
-  // Check if orbit is complete (all hexagons filled)
+  // Check if orbit is complete (all non-black hexagons filled)
   const isOrbitComplete = useCallback((orbitCenter) => {
     const orbit1 = getOrbit(orbitCenter.q, orbitCenter.r, 1);
     return orbit1.every(hex => {
       const key = `${hex.q},${hex.r}`;
-      const value = grid[key]?.value;
+      const hexData = grid[key];
+      // Black hexagons and centers don't need to be filled
+      if (hexData?.isBlack || hexData?.isCenter) {
+        return true;
+      }
+      const value = hexData?.value;
       return value !== null && value >= 0 && value <= 9;
     });
   }, [grid]);
@@ -314,16 +399,20 @@ export function useGame(initialCenters = []) {
       return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     }
     
-    // Collect all used numbers from all orbits this hex belongs to
+    // Collect all used numbers from all orbits this hex belongs to (excluding black hexagons)
     const usedNumbers = new Set();
     hex.orbitCenters.forEach(orbitCenter => {
       const orbit1 = getOrbit(orbitCenter.q, orbitCenter.r, 1);
       orbit1.forEach(h => {
         const k = `${h.q},${h.r}`;
         if (k !== key) {
-          const value = grid[k]?.value;
-          if (value !== null) {
-            usedNumbers.add(value);
+          const hexData = grid[k];
+          // Skip black hexagons and centers
+          if (hexData && !hexData.isBlack && !hexData.isCenter) {
+            const value = hexData.value;
+            if (value !== null) {
+              usedNumbers.add(value);
+            }
           }
         }
       });
@@ -332,7 +421,7 @@ export function useGame(initialCenters = []) {
     return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter(n => !usedNumbers.has(n));
   }, [selectedHex, grid]);
 
-  // Get all playable hexagons (non-center hexagons) for navigation
+  // Get all playable hexagons (non-center, non-black hexagons) for navigation
   const getPlayableHexagons = useCallback(() => {
     const playableHexes = [];
     const hexSet = new Set();
@@ -341,7 +430,9 @@ export function useGame(initialCenters = []) {
       const orbit1 = getOrbit(center.q, center.r, 1);
       orbit1.forEach(hex => {
         const key = `${hex.q},${hex.r}`;
-        if (!hexSet.has(key)) {
+        const hexData = grid[key];
+        // Skip centers and black hexagons
+        if (!hexSet.has(key) && hexData && !hexData.isCenter && !hexData.isBlack) {
           hexSet.add(key);
           playableHexes.push(hex);
         }
@@ -349,7 +440,7 @@ export function useGame(initialCenters = []) {
     });
     
     return playableHexes;
-  }, [centers]);
+  }, [centers, grid]);
 
   // Navigate to next/previous hexagon
   const navigateHex = useCallback((direction) => {

@@ -9,6 +9,7 @@ export default function Hexagon({
   value, 
   isCenter, 
   isSelected,
+  isBlack = false,
   hasDuplicate = false,
   isHighlighted = false,
   isInIncorrectOrbit = false,
@@ -37,6 +38,9 @@ export default function Hexagon({
 
   const handleClick = (e) => {
     e.stopPropagation(); // Prevent event from bubbling to SVG
+    // Black hexagons are not interactive
+    if (isBlack) return;
+    
     if (isCenter) {
       // Clicking center rotates the orbit
       onRotate?.(q, r);
@@ -73,7 +77,9 @@ export default function Hexagon({
       <polygon
         points={points}
         fill={
-          isInCorrectOrbit
+          isBlack
+            ? '#4A4238'
+            : isInCorrectOrbit
             ? '#97DB4F'
             : isInIncorrectOrbit
             ? '#f5e6e6'
@@ -88,7 +94,9 @@ export default function Hexagon({
             : '#f0f0f0'
         }
         stroke={
-          isSelected
+          isBlack
+            ? '#2A2218'
+            : isSelected
             ? '#4A4238'
             : isInCorrectOrbit
             ? '#79C99E'
@@ -111,7 +119,7 @@ export default function Hexagon({
         }
         className={isRotating ? 'rotating-polygon' : ''}
       />
-      {value !== null && (
+      {value !== null && !isBlack && (
         <text
           x="0"
           y="0"
@@ -137,27 +145,16 @@ export default function Hexagon({
           ↻
         </text>
       )}
-      {!isCenter && rotation !== 0 && (
-        <text
-          x="0"
-          y={HEX_SIZE * 0.7}
-          textAnchor="middle"
-          fontSize={10}
-          fill="#4D5359"
-        >
-          ↻{rotation}
-        </text>
-      )}
     </>
   );
 
   return (
     <g 
-      className={`hexagon ${isCenter ? 'center' : ''} ${isSelected ? 'selected' : ''} ${hasDuplicate ? 'duplicate' : ''} ${isHighlighted ? 'highlighted' : ''} ${isInIncorrectOrbit ? 'incorrect-orbit' : ''} ${isInCorrectOrbit ? 'correct-orbit' : ''} ${isRotating ? 'rotating' : ''}`}
+      className={`hexagon ${isCenter ? 'center' : ''} ${isBlack ? 'black' : ''} ${isSelected ? 'selected' : ''} ${hasDuplicate ? 'duplicate' : ''} ${isHighlighted ? 'highlighted' : ''} ${isInIncorrectOrbit ? 'incorrect-orbit' : ''} ${isInCorrectOrbit ? 'correct-orbit' : ''} ${isRotating ? 'rotating' : ''}`}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: isBlack ? 'not-allowed' : 'pointer' }}
     >
       {isRotating && rotationOffset ? (
         // Animated rotation: translate to orbit center, rotate, translate by offset

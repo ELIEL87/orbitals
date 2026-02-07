@@ -13,6 +13,12 @@ const INITIAL_CENTERS = [
   { q: 1, r: 2, target: 18 },   // Distance 3 from (0,0), distance 2 from (2,0)
 ];
 
+// Black hexagon positions (unfillable hexagons that don't count toward sums)
+// Format: array of {q, r} coordinates
+const BLACK_HEXAGONS = [
+  { q: 1, r: 0 },  // Black hexagon shared between center 1 and center 2 orbits
+];
+
 function App() {
   const {
     grid,
@@ -30,7 +36,7 @@ function App() {
     isOrbitIncorrect,
     isOrbitCorrect,
     navigateHex,
-  } = useGame(INITIAL_CENTERS);
+  } = useGame(INITIAL_CENTERS, BLACK_HEXAGONS);
 
   const [hoveredHex, setHoveredHex] = useState(null);
 
@@ -104,44 +110,46 @@ function App() {
       </header>
 
       <div className="game-container">
-        <div 
-          className="game-board"
-          onClick={(e) => {
-            // If clicking on the game board container (not on SVG), deselect
-            if (e.target === e.currentTarget || e.target.className === 'game-board') {
-              handleHexClick(null, null);
-            }
-          }}
-        >
-          <HexagonGrid
-            grid={grid}
-            centers={centers}
-            selectedHex={selectedHex}
-            onHexClick={handleHexClick}
-            onHexRotate={handleRotate}
-            hasDuplicates={hasDuplicates}
-            rotationAngles={rotationAngles}
-            isOrbitIncorrect={isOrbitIncorrect}
-            isOrbitCorrect={isOrbitCorrect}
-            hoveredHex={hoveredHex}
-            onHexHover={setHoveredHex}
-          />
+        <div className="instructions">
+          <h3>How to Play</h3>
+          <ul>
+            <li>Click a hexagon or use arrow keys to select it</li>
+            <li>Type a number (0-9)</li>
+            <li>Press Backspace/Delete to clear a hexagon</li>
+            <li>Arrow keys (↑↓←→) to navigate between hexagons</li>
+            <li>Each number can only appear once per orbit</li>
+            <li>Click the center hexagon to rotate its orbit</li>
+            <li>Sum of numbers in each orbit must equal the center number</li>
+          </ul>
+        </div>
+
+        <div className="game-board-wrapper">
+          <div 
+            className="game-board"
+            onClick={(e) => {
+              // If clicking on the game board container (not on SVG), deselect
+              if (e.target === e.currentTarget || e.target.className === 'game-board') {
+                handleHexClick(null, null);
+              }
+            }}
+          >
+            <HexagonGrid
+              grid={grid}
+              centers={centers}
+              selectedHex={selectedHex}
+              onHexClick={handleHexClick}
+              onHexRotate={handleRotate}
+              hasDuplicates={hasDuplicates}
+              rotationAngles={rotationAngles}
+              isOrbitIncorrect={isOrbitIncorrect}
+              isOrbitCorrect={isOrbitCorrect}
+              hoveredHex={hoveredHex}
+              onHexHover={setHoveredHex}
+            />
+          </div>
         </div>
 
         <div className="game-controls">
-          <div className="instructions">
-            <h3>How to Play</h3>
-            <ul>
-              <li>Click a hexagon or use arrow keys to select it</li>
-              <li>Type a number (0-9)</li>
-              <li>Press Backspace/Delete to clear a hexagon</li>
-              <li>Arrow keys (↑↓←→) to navigate between hexagons</li>
-              <li>Each number can only appear once per orbit</li>
-              <li>Click the center hexagon to rotate its orbit</li>
-              <li>Sum of numbers in each orbit must equal the center number</li>
-            </ul>
-          </div>
-
           {selectedHex && (() => {
             const availableNumbers = getAvailableNumbers();
             return (

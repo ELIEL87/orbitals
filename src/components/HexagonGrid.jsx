@@ -19,16 +19,30 @@ export default function HexagonGrid({
     const hexes = new Set();
     const hexArray = [];
     
-    // Add all center hexes and their orbit 1 (radius 1)
+    // Add all center hexes
     centers.forEach(center => {
-      // Add center
       const centerKey = `${center.q},${center.r}`;
       if (!hexes.has(centerKey)) {
         hexes.add(centerKey);
         hexArray.push({ q: center.q, r: center.r });
       }
-      
-      // Add orbit 1
+    });
+    
+    // Add all hexagons from the grid (including moved black hexagons)
+    Object.keys(grid).forEach(key => {
+      const hexData = grid[key];
+      if (hexData && !hexData.isCenter) {
+        const [q, r] = key.split(',').map(Number);
+        const hexKey = `${q},${r}`;
+        if (!hexes.has(hexKey)) {
+          hexes.add(hexKey);
+          hexArray.push({ q, r });
+        }
+      }
+    });
+    
+    // Also ensure all orbit positions are included (for initial render)
+    centers.forEach(center => {
       const orbit1 = getOrbit(center.q, center.r, 1);
       orbit1.forEach(hex => {
         const key = `${hex.q},${hex.r}`;
@@ -40,7 +54,7 @@ export default function HexagonGrid({
     });
     
     return hexArray;
-  }, [centers]);
+  }, [centers, grid]);
 
   const bounds = useMemo(() => {
     if (allHexes.length === 0) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
@@ -77,8 +91,8 @@ export default function HexagonGrid({
       const key = `${hexToCheck.q},${hexToCheck.r}`;
       const hexData = grid[key];
       
-      // Don't highlight when hovering over centers
-      if (hexData?.orbitCenters && !hexData.isCenter) {
+      // Don't highlight when hovering over centers or black hexagons
+      if (hexData?.orbitCenters && !hexData.isCenter && !hexData.isBlack) {
         hexData.orbitCenters.forEach(oc => {
           orbits.add(`${oc.q},${oc.r}`);
         });
@@ -116,6 +130,7 @@ export default function HexagonGrid({
         const isCenter = centers.some(c => c.q === hex.q && c.r === hex.r);
         const isSelected = selectedHex?.q === hex.q && selectedHex?.r === hex.r;
         const hexData = grid[key];
+        const isBlack = hexData?.isBlack ?? false;
         
         // Check for duplicates in any orbit this hex belongs to
         const hasDuplicate = hexData && !isCenter && hexData.orbitCenters && hexData.orbitCenters.length > 0
@@ -127,7 +142,8 @@ export default function HexagonGrid({
         let isInIncorrectOrbit = false;
         let isInCorrectOrbit = false;
         
-        if (hexData?.orbitCenters) {
+        // Black hexagons don't get colored by orbit status
+        if (!isBlack && hexData?.orbitCenters) {
           isHighlighted = hexData.orbitCenters.some(oc => 
             highlightedOrbits.has(`${oc.q},${oc.r}`)
           );
@@ -163,6 +179,7 @@ export default function HexagonGrid({
             y={y}
             value={value}
             isCenter={isCenter}
+            isBlack={isBlack}
             isSelected={isSelected}
             hasDuplicate={hasDuplicate}
             isHighlighted={isHighlighted}
