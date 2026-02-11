@@ -1,6 +1,6 @@
 // Calculate puzzle space with "black hexagons" (unfillable positions)
 
-console.log("=== Orbitals Puzzle Space with Black Hexagons ===\n");
+console.log("=== Orbital Shift Puzzle Space with Black Hexagons ===\n");
 
 // Without black hexagons: always 6 positions, targets 15-39
 console.log("Current setup (6 positions per orbit):");

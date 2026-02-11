@@ -3,6 +3,7 @@ import HexagonGrid from './components/HexagonGrid';
 import ModeSelector from './components/ModeSelector';
 import { useGame } from './hooks/useGame';
 import { generateDailyPuzzle, generateFreePlayPuzzle } from './utils/puzzleGenerator';
+import orbitsLogo from './assets/orbits_white.svg';
 import './App.css';
 
 function Game({ centers, blackHexagons }) {
@@ -181,6 +182,7 @@ function App() {
   const [difficulty, setDifficulty] = useState('medium');
   const [puzzleConfig, setPuzzleConfig] = useState(null);
   const [puzzleKey, setPuzzleKey] = useState(0);
+  const [page, setPage] = useState('landing');
 
   const generatePuzzle = useCallback((currentMode, currentDifficulty) => {
     if (currentMode === 'daily') {
@@ -207,12 +209,44 @@ function App() {
     setPuzzleKey(k => k + 1);
   };
 
-  if (!puzzleConfig) return null;
+  const handlePlayFreePlay = () => {
+    setMode('freeplay');
+    setPuzzleKey(k => k + 1);
+    setPage('game');
+  };
+
+  const handlePlayDaily = () => {
+    setMode('daily');
+    setPuzzleKey(k => k + 1);
+    setPage('game');
+  };
+
+  if (!puzzleConfig && page === 'game') return null;
+
+  if (page === 'landing') {
+    return (
+      <div className="landing-page">
+        <img src={orbitsLogo} alt="Orbital Shift" className="landing-logo" />
+        <h1 className="landing-title">Orbital Shift</h1>
+        <p className="landing-description">
+          Fill the orbits so each ring sums to its center number. No repeats allowed.
+        </p>
+        <div className="landing-buttons">
+          <button className="landing-btn-primary" onClick={handlePlayDaily}>
+            Daily Challenge
+          </button>
+          <button className="landing-btn-secondary" onClick={handlePlayFreePlay}>
+            Free Play
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
       <header className="header">
-        <h1>Orbitals</h1>
+        <h1>Orbital Shift</h1>
         <p className="subtitle">Fill the orbits to match the center numbers</p>
       </header>
 

@@ -1,4 +1,4 @@
-// Calculate puzzle space for Orbitals game
+// Calculate puzzle space for Orbital Shift game
 
 // Pre-calculated: ways to choose 6 distinct numbers (0-9) that sum to each target
 // This is computationally expensive, so using known values
@@ -30,7 +30,7 @@ const targetCombinations = {
   39: 1   // 4+5+6+7+8+9
 };
 
-console.log("=== Orbitals Puzzle Space Analysis ===\n");
+console.log("=== Orbital Shift Puzzle Space Analysis ===\n");
 
 // Count valid targets
 const validTargets = Object.keys(targetCombinations).map(Number);

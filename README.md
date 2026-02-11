@@ -1,4 +1,4 @@
-# Orbitals - Hexagon Puzzle Game
+# Orbital Shift - Hexagon Puzzle Game
 
 A React-based puzzle game where you fill hexagon orbits with numbers to match target sums. Deployable on Vercel.
 
