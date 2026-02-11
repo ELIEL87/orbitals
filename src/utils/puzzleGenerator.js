@@ -5,20 +5,27 @@ import { createRng, dateToSeed } from './rng';
 // Each template is an array of {q, r} offsets from origin
 const TEMPLATES = {
   easy: [
-    // 2 centers, distance >= 3 (no orbit overlap)
-    [{ q: 0, r: 0 }, { q: 3, r: 0 }],
-    [{ q: 0, r: 0 }, { q: 0, r: 3 }],
-    [{ q: 0, r: 0 }, { q: 3, r: -3 }],
-    [{ q: 0, r: 0 }, { q: -3, r: 3 }],
+    // 1 center (single orbit)
+    [{ q: 0, r: 0 }],
+    [{ q: 0, r: 0 }],
+    [{ q: 0, r: 0 }],
+    [{ q: 0, r: 0 }],
   ],
   medium: [
+    // 2 centers at distance 2 (intersecting orbits)
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }],
+    [{ q: 0, r: 0 }, { q: 0, r: 2 }],
+    [{ q: 0, r: 0 }, { q: 2, r: -2 }],
+    [{ q: 0, r: 0 }, { q: -2, r: 2 }],
+  ],
+  hard: [
     // 3 centers, mix of distance 2 and 3
     [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }],
     [{ q: 0, r: 0 }, { q: 0, r: 2 }, { q: 0, r: 4 }],
     [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: -1, r: 3 }],
     [{ q: 0, r: 0 }, { q: 2, r: -2 }, { q: 0, r: 3 }],
   ],
-  hard: [
+  extreme: [
     // 3 centers, all pairs distance 2 (maximum overlap)
     [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 1, r: 2 }],
     [{ q: 0, r: 0 }, { q: 0, r: 2 }, { q: 2, r: 0 }],
@@ -42,7 +49,7 @@ function placeCenters(rng, difficulty) {
 }
 
 function placeBlackHexagons(rng, centers, difficulty) {
-  if (difficulty === 'easy') return [];
+  if (difficulty === 'easy' || difficulty === 'medium') return [];
 
   // Collect all orbit positions (excluding center positions)
   const centerSet = new Set(centers.map(c => `${c.q},${c.r}`));
@@ -60,7 +67,7 @@ function placeBlackHexagons(rng, centers, difficulty) {
     });
   });
 
-  const count = difficulty === 'hard' ? rng.nextInt(1, 2) : rng.nextInt(0, 1);
+  const count = difficulty === 'extreme' ? rng.nextInt(2, 3) : rng.nextInt(1, 2);
   if (count === 0) return [];
 
   const shuffled = rng.shuffle(orbitPositions);
