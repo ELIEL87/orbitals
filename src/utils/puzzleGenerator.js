@@ -225,3 +225,11 @@ export function generateFreePlayPuzzle(difficulty) {
   const rng = createRng(seed);
   return generatePuzzle(rng, difficulty);
 }
+
+const TUTORIAL_SEEDS = [42, 137, 256];
+
+export function generateTutorialPuzzle(level) {
+  const rng = createRng(TUTORIAL_SEEDS[level]);
+  const difficulties = ['easy', 'medium', 'hard'];
+  return generatePuzzle(rng, difficulties[level]);
+}
