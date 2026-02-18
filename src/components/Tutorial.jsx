@@ -16,7 +16,7 @@ const STEPS = [
   {
     title: 'Black Hexagons',
     description:
-      'Black hexagons are blocked — you can\'t place numbers on them. The orbit sum must still match the center, using only the available positions.',
+      'Black hexagons block number slots. Rotate orbits to move them where they\'re needed — the target sum tells you how many slots should be blocked.',
   },
 ];
 

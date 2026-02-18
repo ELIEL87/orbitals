@@ -361,7 +361,9 @@ export function useGame(initialCenters = [], blackHexagons = []) {
       const orbit1 = getOrbit(center.q, center.r, 1);
       const allFilled = orbit1.every(hex => {
         const key = `${hex.q},${hex.r}`;
-        const value = grid[key]?.value;
+        const hexData = grid[key];
+        if (hexData?.isBlack || hexData?.isCenter) return true;
+        const value = hexData?.value;
         return value !== null && value >= 0 && value <= 9;
       });
       
