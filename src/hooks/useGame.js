@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { getOrbit, hexDistance, hexToPixel } from '../utils/hexagon';
 
-export function useGame(initialCenters = [], blackHexagons = []) {
+export function useGame(initialCenters = [], blackHexagons = [], initialGrid = null) {
   const [centers] = useState(initialCenters);
   const [grid, setGrid] = useState({});
   const [selectedHex, setSelectedHex] = useState(null);
@@ -11,6 +11,11 @@ export function useGame(initialCenters = [], blackHexagons = []) {
 
   // Initialize grid with orbits
   const initializeGrid = useCallback(() => {
+    if (initialGrid) {
+      setGrid(initialGrid);
+      return;
+    }
+
     const newGrid = {};
     
     centers.forEach(center => {
@@ -54,7 +59,7 @@ export function useGame(initialCenters = [], blackHexagons = []) {
     });
     
     setGrid(newGrid);
-  }, [centers, blackHexSet]);
+  }, [centers, blackHexSet, initialGrid]);
 
   const handleHexClick = useCallback((q, r) => {
     // If q and r are null, deselect

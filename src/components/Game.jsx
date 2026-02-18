@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react';
 import HexagonGrid from './HexagonGrid';
 import { useGame } from '../hooks/useGame';
 
-function Game({ centers, blackHexagons, onWin, hideInstructions }) {
+function getTodayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, initialGrid }) {
   const {
     grid,
     selectedHex,
@@ -19,7 +24,7 @@ function Game({ centers, blackHexagons, onWin, hideInstructions }) {
     isOrbitIncorrect,
     isOrbitCorrect,
     navigateHex,
-  } = useGame(centers, blackHexagons);
+  } = useGame(centers, blackHexagons, initialGrid);
 
   const [hoveredHex, setHoveredHex] = useState(null);
   const [gameWon, setGameWon] = useState(false);
@@ -35,6 +40,15 @@ function Game({ centers, blackHexagons, onWin, hideInstructions }) {
       onWin();
     }
   }, [checkWin, grid, onWin]);
+
+  // Persist daily grid to localStorage on every change
+  useEffect(() => {
+    if (mode !== 'daily' || Object.keys(grid).length === 0) return;
+    const gridToSave = Object.fromEntries(
+      Object.entries(grid).map(([k, v]) => [k, { ...v, isRotating: false }])
+    );
+    localStorage.setItem(`orbital-daily-grid-${getTodayString()}`, JSON.stringify(gridToSave));
+  }, [grid, mode]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -138,7 +152,7 @@ function Game({ centers, blackHexagons, onWin, hideInstructions }) {
 
           {!selectedHex && (
             <div className="status">
-              <p>Click a hexagon to start</p>
+              <p>Tap or click a hexagon to enter a number</p>
             </div>
           )}
 
@@ -146,27 +160,16 @@ function Game({ centers, blackHexagons, onWin, hideInstructions }) {
             <div className="win-message">
               <h2>Solved!</h2>
               <p>All orbits are correctly filled!</p>
+              {mode === 'daily' && (
+                <button className="continue-freeplay-btn" onClick={onContinueFreePlay}>
+                  Continue in Free Play
+                </button>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {!hideInstructions && (
-        <div className="instructions-wrapper">
-          <div className="instructions">
-            <h3>How to Play</h3>
-            <ul>
-              <li>Click a hexagon or use arrow keys to select it</li>
-              <li>Type a number (0-9)</li>
-              <li>Press Backspace/Delete to clear a hexagon</li>
-              <li>Arrow keys to navigate between hexagons</li>
-              <li>Each number can only appear once per orbit</li>
-              <li>Click the center hexagon to rotate its orbit</li>
-              <li>Sum of numbers in each orbit must equal the center number</li>
-            </ul>
-          </div>
-        </div>
-      )}
     </>
   );
 }

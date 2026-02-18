@@ -6,6 +6,8 @@ import { generateDailyPuzzle, generateFreePlayPuzzle } from './utils/puzzleGener
 import orbitsLogo from './assets/orbits_white.svg';
 import './App.css';
 
+const DAILY_STORAGE_KEY = 'orbital-daily-completed';
+
 function getTodayString() {
   const d = new Date();
   const yyyy = d.getFullYear();
@@ -14,11 +16,29 @@ function getTodayString() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+function isDailyCompleted() {
+  return localStorage.getItem(DAILY_STORAGE_KEY) === getTodayString();
+}
+
+function markDailyCompleted() {
+  localStorage.setItem(DAILY_STORAGE_KEY, getTodayString());
+}
+
+function loadDailyGrid() {
+  try {
+    const saved = localStorage.getItem(`orbital-daily-grid-${getTodayString()}`);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
 function App() {
   const [mode, setMode] = useState('daily');
   const [difficulty, setDifficulty] = useState('medium');
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [page, setPage] = useState('landing');
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const generatePuzzle = useCallback((currentMode, currentDifficulty) => {
     if (currentMode === 'daily') {
@@ -28,12 +48,6 @@ function App() {
   }, []);
 
   const [puzzleConfig, setPuzzleConfig] = useState(() => generatePuzzle(mode, difficulty));
-
-  const handleModeChange = (newMode) => {
-    setMode(newMode);
-    setPuzzleConfig(generatePuzzle(newMode, difficulty));
-    setPuzzleKey(k => k + 1);
-  };
 
   const handleDifficultyChange = (newDifficulty) => {
     const config = generatePuzzle(mode, newDifficulty);
@@ -64,6 +78,7 @@ function App() {
   if (!puzzleConfig && page === 'game') return null;
 
   if (page === 'landing') {
+    const dailyDone = isDailyCompleted();
     return (
       <div className="landing-page">
         <img src={orbitsLogo} alt="Orbital Shift" className="landing-logo" />
@@ -72,8 +87,11 @@ function App() {
           Fill the orbits so each ring sums to its center number. No repeats allowed.
         </p>
         <div className="landing-buttons">
-          <button className="landing-btn-primary" onClick={handlePlayDaily}>
-            Daily Challenge
+          <button
+            className={`landing-btn-primary${dailyDone ? ' completed' : ''}`}
+            onClick={handlePlayDaily}
+          >
+            {dailyDone ? 'Daily Challenge ✓' : 'Daily Challenge'}
           </button>
           <button className="landing-btn-secondary" onClick={handlePlayFreePlay}>
             Free Play
@@ -106,14 +124,14 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Orbital Shift</h1>
-        <p className="subtitle">Fill the orbits to match the center numbers</p>
+        <button className="header-back" onClick={() => setPage('landing')}>← Back</button>
+        <h1 className="header-title">Orbital Shift</h1>
+        <button className="header-help" onClick={() => setHelpOpen(true)}>?</button>
       </header>
 
       <ModeSelector
         mode={mode}
         difficulty={difficulty}
-        onModeChange={handleModeChange}
         onDifficultyChange={handleDifficultyChange}
         onNewPuzzle={handleNewPuzzle}
       />
@@ -122,7 +140,30 @@ function App() {
         key={puzzleKey}
         centers={puzzleConfig.centers}
         blackHexagons={puzzleConfig.blackHexagons}
+        mode={mode}
+        initialGrid={mode === 'daily' ? loadDailyGrid() : null}
+        onWin={() => { if (mode === 'daily') markDailyCompleted(); }}
+        onContinueFreePlay={handlePlayFreePlay}
       />
+
+      {helpOpen && (
+        <div className="help-modal-overlay" onClick={() => setHelpOpen(false)}>
+          <div className="help-modal" onClick={e => e.stopPropagation()}>
+            <div className="help-modal-header">
+              <h2>How to Play</h2>
+              <button className="help-modal-close" onClick={() => setHelpOpen(false)}>×</button>
+            </div>
+            <ul className="help-modal-list">
+              <li>Tap or click a hexagon to select it</li>
+              <li>Enter a number (0–9) using the buttons or keyboard</li>
+              <li>Press Backspace/Delete or Clear to erase a cell</li>
+              <li>Each number can only appear once per orbit</li>
+              <li>Tap a center hexagon to rotate its orbit</li>
+              <li>The sum of numbers in each orbit must equal the center number</li>
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
