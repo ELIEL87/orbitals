@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Game from './components/Game';
 import Tutorial from './components/Tutorial';
 import ModeSelector from './components/ModeSelector';
@@ -17,7 +17,6 @@ function getTodayString() {
 function App() {
   const [mode, setMode] = useState('daily');
   const [difficulty, setDifficulty] = useState('medium');
-  const [puzzleConfig, setPuzzleConfig] = useState(null);
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [page, setPage] = useState('landing');
 
@@ -28,12 +27,11 @@ function App() {
     return generateFreePlayPuzzle(currentDifficulty);
   }, []);
 
-  useEffect(() => {
-    setPuzzleConfig(generatePuzzle(mode, difficulty));
-  }, [mode, generatePuzzle]);
+  const [puzzleConfig, setPuzzleConfig] = useState(() => generatePuzzle(mode, difficulty));
 
   const handleModeChange = (newMode) => {
     setMode(newMode);
+    setPuzzleConfig(generatePuzzle(newMode, difficulty));
     setPuzzleKey(k => k + 1);
   };
 
@@ -51,12 +49,14 @@ function App() {
 
   const handlePlayFreePlay = () => {
     setMode('freeplay');
+    setPuzzleConfig(generatePuzzle('freeplay', difficulty));
     setPuzzleKey(k => k + 1);
     setPage('game');
   };
 
   const handlePlayDaily = () => {
     setMode('daily');
+    setPuzzleConfig(generatePuzzle('daily', difficulty));
     setPuzzleKey(k => k + 1);
     setPage('game');
   };
@@ -95,6 +95,7 @@ function App() {
         onBack={() => setPage('landing')}
         onFinish={() => {
           setMode('freeplay');
+          setPuzzleConfig(generatePuzzle('freeplay', difficulty));
           setPuzzleKey(k => k + 1);
           setPage('game');
         }}
