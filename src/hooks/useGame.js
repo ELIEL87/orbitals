@@ -12,8 +12,13 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
   // Initialize grid with orbits
   const initializeGrid = useCallback(() => {
     if (initialGrid) {
-      setGrid(initialGrid);
-      return;
+      // Validate that the saved grid matches the current puzzle's centers.
+      // If any center is missing (e.g. puzzle structure changed), discard the saved grid.
+      const isCompatible = centers.every(c => initialGrid[`${c.q},${c.r}`]?.isCenter === true);
+      if (isCompatible) {
+        setGrid(initialGrid);
+        return;
+      }
     }
 
     const newGrid = {};

@@ -12,32 +12,32 @@ const TEMPLATES = {
     [{ q: 0, r: 0 }],
   ],
   easy: [
-    // 2 centers at distance 2 (intersecting orbits)
-    [{ q: 0, r: 0 }, { q: 2, r: 0 }],
-    [{ q: 0, r: 0 }, { q: 0, r: 2 }],
-    [{ q: 0, r: 0 }, { q: 2, r: -2 }],
-    [{ q: 0, r: 0 }, { q: -2, r: 2 }],
-  ],
-  medium: [
-    // 2 centers at distance 2 (intersecting orbits)
-    [{ q: 0, r: 0 }, { q: 2, r: 0 }],
-    [{ q: 0, r: 0 }, { q: 0, r: 2 }],
-    [{ q: 0, r: 0 }, { q: 2, r: -2 }],
-    [{ q: 0, r: 0 }, { q: -2, r: 2 }],
-  ],
-  hard: [
-    // 3 centers, mix of distance 2 and 3
+    // 3 centers
     [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }],
     [{ q: 0, r: 0 }, { q: 0, r: 2 }, { q: 0, r: 4 }],
     [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: -1, r: 3 }],
     [{ q: 0, r: 0 }, { q: 2, r: -2 }, { q: 0, r: 3 }],
   ],
+  medium: [
+    // 4 centers
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 2, r: 2 }],
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 2, r: -2 }],
+    [{ q: 0, r: 0 }, { q: 0, r: 2 }, { q: 0, r: 4 }, { q: 2, r: 2 }],
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 4, r: -2 }],
+  ],
+  hard: [
+    // 5 centers
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 2, r: 2 }, { q: 2, r: -2 }],
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 6, r: 0 }, { q: 4, r: -2 }],
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 1, r: 2 }, { q: 3, r: 2 }, { q: 2, r: 4 }],
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 2, r: 2 }, { q: 4, r: 2 }],
+  ],
   extreme: [
-    // 3 centers, all pairs distance 2 (maximum overlap)
-    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 1, r: 2 }],
-    [{ q: 0, r: 0 }, { q: 0, r: 2 }, { q: 2, r: 0 }],
-    [{ q: 0, r: 0 }, { q: 2, r: -2 }, { q: 2, r: 0 }],
-    [{ q: 0, r: 0 }, { q: -2, r: 2 }, { q: 0, r: 2 }],
+    // 6 centers
+    [{ q: 2, r: 0 }, { q: 1, r: 2 }, { q: -1, r: 2 }, { q: -2, r: 0 }, { q: -1, r: -2 }, { q: 1, r: -2 }],
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 1, r: 2 }, { q: 3, r: 2 }, { q: 5, r: 2 }],
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 1, r: 2 }, { q: 3, r: 2 }, { q: 2, r: 4 }],
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 1, r: 2 }, { q: 3, r: 2 }, { q: 0, r: 4 }, { q: 2, r: 4 }],
   ],
 };
 
@@ -61,10 +61,10 @@ function placeSolutionBlackHexagons(rng, centers, difficulty) {
 
   let count;
   switch (difficulty) {
-    case 'easy': count = 1; break;
-    case 'medium': count = rng.nextInt(1, 2); break;
-    case 'hard': count = rng.nextInt(2, 3); break;
-    case 'extreme': count = rng.nextInt(3, 4); break;
+    case 'easy': count = 2; break;
+    case 'medium': count = rng.nextInt(2, 3); break;
+    case 'hard': count = rng.nextInt(3, 5); break;
+    case 'extreme': count = rng.nextInt(4, 6); break;
     default: return [];
   }
 
