@@ -467,15 +467,12 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
       const dx = pos.x - current.x;
       const dy = pos.y - current.y;
 
-      // How far along the desired direction (must be positive)
+      // Must be in the forward half-plane
       const parallel = dx * dir.x + dy * dir.y;
-      if (parallel <= 0) return; // wrong direction or exactly perpendicular
+      if (parallel <= 0) return;
 
-      // How far off-axis
-      const perpendicular = Math.abs(dx * dir.y - dy * dir.x);
-
-      // Score: prefer close & aligned; penalize off-axis heavily
-      const score = parallel + 3 * perpendicular;
+      // Pick the closest hex in the forward direction
+      const score = Math.sqrt(dx * dx + dy * dy);
 
       if (score < bestScore) {
         bestScore = score;
