@@ -19,7 +19,7 @@ export default function ModeSelector({
       {mode === 'freeplay' && (
         <div className="freeplay-controls">
           <div className="difficulty-selector">
-            {['beginner', 'easy', 'medium', 'hard', 'extreme'].map(d => (
+            {['beginner', 'easy', 'medium', 'hard', 'extreme', 'insane'].map(d => (
               <button
                 key={d}
                 className={`difficulty-btn ${d} ${difficulty === d ? 'active' : ''}`}

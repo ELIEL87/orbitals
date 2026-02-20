@@ -39,6 +39,17 @@ const TEMPLATES = {
     [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 1, r: 2 }, { q: 3, r: 2 }, { q: 2, r: 4 }],
     [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 1, r: 2 }, { q: 3, r: 2 }, { q: 0, r: 4 }, { q: 2, r: 4 }],
   ],
+  insane: [
+    // 7 centers
+    // Flower: center hub surrounded by 6 neighbors all at distance 2
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 0, r: 2 }, { q: -2, r: 2 }, { q: -2, r: 0 }, { q: 0, r: -2 }, { q: 2, r: -2 }],
+    // 4+3 rectangular grid
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 6, r: 0 }, { q: 0, r: 2 }, { q: 2, r: 2 }, { q: 4, r: 2 }],
+    // 3+2+2 expanding triangle
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 1, r: 2 }, { q: 3, r: 2 }, { q: 0, r: 4 }, { q: 2, r: 4 }],
+    // 3+3+1 diamond
+    [{ q: 0, r: 0 }, { q: 2, r: 0 }, { q: 4, r: 0 }, { q: 0, r: 2 }, { q: 2, r: 2 }, { q: 4, r: 2 }, { q: 2, r: 4 }],
+  ],
 };
 
 function placeCenters(rng, difficulty) {
@@ -65,6 +76,7 @@ function placeSolutionBlackHexagons(rng, centers, difficulty) {
     case 'medium': count = rng.nextInt(2, 3); break;
     case 'hard': count = rng.nextInt(3, 5); break;
     case 'extreme': count = rng.nextInt(4, 6); break;
+    case 'insane': count = rng.nextInt(5, 7); break;
     default: return [];
   }
 
