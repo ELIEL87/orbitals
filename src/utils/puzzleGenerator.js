@@ -411,7 +411,7 @@ function generatePuzzle(rng, difficulty) {
 export function generateDailyPuzzle(dateString) {
   const seed = dateToSeed(dateString);
   const rng = createRng(seed);
-  return generatePuzzle(rng, 'medium');
+  return generatePuzzle(rng, 'extreme');
 }
 
 export function generateFreePlayPuzzle(difficulty) {
