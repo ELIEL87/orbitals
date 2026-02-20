@@ -374,36 +374,70 @@ body {
   border-radius: 8px;
 }
 
-.win-message {
-  text-align: center;
+/* Win modal */
+.win-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
   padding: 20px;
+}
+
+.win-modal {
+  background: #f8f9fa;
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+  animation: winModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.win-modal h2 {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #79C99E 0%, #508484 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+}
+
+.win-modal p {
+  color: #4D5359;
+  font-size: 1rem;
+  margin-bottom: 28px;
+}
+
+.win-modal-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
   background: linear-gradient(135deg, #79C99E 0%, #508484 100%);
   color: white;
-  border-radius: 8px;
-  margin-top: 20px;
-  animation: pulse 2s infinite;
-}
-
-.win-message h2 {
-  margin-bottom: 10px;
-}
-
-.continue-freeplay-btn {
-  margin-top: 12px;
-  width: 100%;
-  padding: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: opacity 0.2s;
 }
 
-.continue-freeplay-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
+.win-modal-btn:hover {
+  opacity: 0.85;
+}
+
+@keyframes winModalIn {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .error-message {
@@ -414,15 +448,6 @@ body {
   border-radius: 8px;
   margin-top: 20px;
   border: 1px solid #fcc;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
 }
 
 /* Hexagon styles */
@@ -550,11 +575,6 @@ body {
 
   .num-btn {
     font-size: 1.1rem;
-  }
-
-  .win-message {
-    margin-top: 12px;
-    padding: 14px;
   }
 
   .status {

@@ -144,6 +144,7 @@ function App() {
         initialGrid={mode === 'daily' ? loadDailyGrid() : null}
         onWin={() => { if (mode === 'daily') markDailyCompleted(); }}
         onContinueFreePlay={handlePlayFreePlay}
+        onNewPuzzle={handleNewPuzzle}
       />
 
       {helpOpen && (

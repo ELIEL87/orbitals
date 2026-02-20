@@ -7,7 +7,7 @@ function getTodayString() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, initialGrid }) {
+function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPuzzle, initialGrid }) {
   const {
     grid,
     selectedHex,
@@ -155,20 +155,26 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, initial
               <p>Tap or click a hexagon to enter a number</p>
             </div>
           )}
-
-          {gameWon && (
-            <div className="win-message">
-              <h2>Solved!</h2>
-              <p>All orbits are correctly filled!</p>
-              {mode === 'daily' && (
-                <button className="continue-freeplay-btn" onClick={onContinueFreePlay}>
-                  Continue in Free Play
-                </button>
-              )}
-            </div>
-          )}
         </div>
       </div>
+
+      {gameWon && (
+        <div className="win-modal-overlay">
+          <div className="win-modal">
+            <h2>Solved!</h2>
+            <p>All orbits are correctly filled!</p>
+            {mode === 'daily' ? (
+              <button className="win-modal-btn" onClick={onContinueFreePlay}>
+                Continue in Free Play
+              </button>
+            ) : (
+              <button className="win-modal-btn" onClick={onNewPuzzle}>
+                New Puzzle
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
     </>
   );
