@@ -218,7 +218,7 @@ body {
   display: flex;
   gap: 30px;
   justify-content: center;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .game-board-wrapper {
@@ -234,7 +234,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
 }
 
 .game-board svg {
