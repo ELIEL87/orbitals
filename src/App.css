@@ -376,6 +376,24 @@ body {
   color: white;
 }
 
+.clear-all-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.9rem;
+  border: 2px solid #b94040;
+  background: white;
+  color: #b94040;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.clear-all-btn:hover {
+  background: #b94040;
+  color: white;
+}
+
 .status {
   text-align: center;
   color: #4D5359;

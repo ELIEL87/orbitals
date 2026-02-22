@@ -96,6 +96,19 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     });
   }, [grid]);
 
+  const clearAll = useCallback(() => {
+    setGrid(prev => {
+      const newGrid = { ...prev };
+      Object.keys(newGrid).forEach(key => {
+        const hex = newGrid[key];
+        if (hex && !hex.isCenter && !hex.isBlack) {
+          newGrid[key] = { ...hex, value: null };
+        }
+      });
+      return newGrid;
+    });
+  }, []);
+
   const handleNumberInput = useCallback((number) => {
     if (!selectedHex) return;
     
@@ -495,6 +508,7 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     handleHexClick,
     handleNumberInput,
     handleRotate,
+    clearAll,
     checkWin,
     isComplete,
     getAvailableNumbers,

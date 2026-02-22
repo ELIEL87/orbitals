@@ -436,6 +436,15 @@ const TUTORIAL_SEEDS = [42, 137, 256];
 
 export function generateTutorialPuzzle(level) {
   const rng = createRng(TUTORIAL_SEEDS[level]);
+  if (level === 1) {
+    // Overlapping orbits step: use easy (multi-center) layout but no black hexagons
+    const maxRetries = 30;
+    for (let i = 0; i < maxRetries; i++) {
+      const centerPositions = placeCenters(rng, 'easy');
+      const centers = solvePuzzle(centerPositions, [], rng);
+      if (centers) return { centers, blackHexagons: [] };
+    }
+  }
   const difficulties = ['beginner', 'easy', 'medium'];
   return generatePuzzle(rng, difficulties[level]);
 }

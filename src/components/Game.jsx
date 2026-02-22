@@ -16,6 +16,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
     handleHexClick,
     handleNumberInput,
     handleRotate,
+    clearAll,
     checkWin,
     getAvailableNumbers,
     hasDuplicates,
@@ -155,10 +156,14 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
               <p>Tap or click a hexagon to enter a number</p>
             </div>
           )}
+
+          <button className="clear-all-btn" onClick={clearAll}>
+            Clear All
+          </button>
         </div>
       </div>
 
-      {gameWon && (
+      {gameWon && (onContinueFreePlay || onNewPuzzle) && (
         <div className="win-modal-overlay">
           <div className="win-modal">
             <h2>Solved!</h2>
