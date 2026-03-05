@@ -426,10 +426,7 @@ body {
 .solved-title {
   font-size: 2.2rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #79C99E 0%, #508484 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #508484;
   line-height: 1;
 }
 
