@@ -5,6 +5,7 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
   const [centers] = useState(initialCenters);
   const [grid, setGrid] = useState({});
   const [selectedHex, setSelectedHex] = useState(null);
+  const [focusedCenter, setFocusedCenter] = useState(null);
   const [blackHexSet] = useState(new Set(blackHexagons.map(bh => `${bh.q},${bh.r}`)));
   const [rotatingOrbit, setRotatingOrbit] = useState(null);
   const [rotationAngles, setRotationAngles] = useState({});
@@ -83,6 +84,7 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     }
     
     setSelectedHex({ q, r });
+    setFocusedCenter(null);
   }, [grid]);
 
   // Check if a number already exists in an orbit
@@ -439,7 +441,9 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     const playableHexes = getPlayableHexagons();
     if (playableHexes.length === 0) return;
 
-    if (!selectedHex) {
+    const activeHex = selectedHex || focusedCenter;
+
+    if (!activeHex) {
       setSelectedHex(playableHexes[0]);
       return;
     }
@@ -454,13 +458,13 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     const dir = dirVectors[direction];
     if (!dir) return;
 
-    const current = hexToPixel(selectedHex.q, selectedHex.r);
+    const current = hexToPixel(activeHex.q, activeHex.r);
 
     let best = null;
     let bestScore = Infinity;
 
     playableHexes.forEach(h => {
-      if (h.q === selectedHex.q && h.r === selectedHex.r) return;
+      if (h.q === activeHex.q && h.r === activeHex.r) return;
       const pos = hexToPixel(h.q, h.r);
       const dx = pos.x - current.x;
       const dy = pos.y - current.y;
@@ -481,9 +485,16 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     });
 
     if (best) {
-      setSelectedHex(best);
+      const bestKey = `${best.q},${best.r}`;
+      if (grid[bestKey]?.isCenter) {
+        setFocusedCenter(best);
+        setSelectedHex(null);
+      } else {
+        setSelectedHex(best);
+        setFocusedCenter(null);
+      }
     }
-  }, [selectedHex, getPlayableHexagons]);
+  }, [selectedHex, focusedCenter, grid, getPlayableHexagons]);
 
   // Returns hex keys to hint after idle timeout.
   // Priority 1: hexes with duplicate values in an orbit.
@@ -523,6 +534,7 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
   return {
     grid,
     selectedHex,
+    focusedCenter,
     centers,
     initializeGrid,
     handleHexClick,

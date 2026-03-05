@@ -19,6 +19,7 @@ export default function Hexagon({
   orbitCenterPos = null,
   rotationAngle = 0,
   isHinted = false,
+  isCenterFocused = false,
   onClick,
   onRotate,
   onHover,
@@ -85,38 +86,44 @@ export default function Hexagon({
             ? '#97DB4F'
             : isInIncorrectOrbit
             ? '#f5e6e6'
-            : isCenter 
-            ? '#508484' 
-            : hasDuplicate 
-            ? '#f5e6e6' 
+            : isCenterFocused
+            ? '#3a7a7a'
+            : isCenter
+            ? '#508484'
+            : hasDuplicate
+            ? '#f5e6e6'
             : isHighlighted
             ? '#6BA3D1'
-            : isSelected 
-            ? '#79C99E' 
+            : isSelected
+            ? '#79C99E'
             : '#f0f0f0'
         }
         stroke={
           isBlack
             ? '#2A2218'
+            : isCenterFocused
+            ? '#ffffff'
             : isSelected
             ? '#4A4238'
             : isInCorrectOrbit
             ? '#79C99E'
             : isInIncorrectOrbit
             ? '#4A4238'
-            : hasDuplicate 
-            ? '#4A4238' 
+            : hasDuplicate
+            ? '#4A4238'
             : isHighlighted
             ? '#508484'
             : '#4D5359'
         }
         strokeWidth={
-          isSelected
+          isCenterFocused
+            ? 5
+            : isSelected
             ? 4
-            : isCenter 
-            ? 2 
-            : (hasDuplicate || isInIncorrectOrbit || isInCorrectOrbit || isHighlighted) 
-            ? 2 
+            : isCenter
+            ? 2
+            : (hasDuplicate || isInIncorrectOrbit || isInCorrectOrbit || isHighlighted)
+            ? 2
             : 1
         }
         className={isRotating ? 'rotating-polygon' : ''}

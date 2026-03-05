@@ -11,6 +11,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
   const {
     grid,
     selectedHex,
+    focusedCenter,
     centers: gameCenters,
     initializeGrid,
     handleHexClick,
@@ -191,7 +192,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
                   handleHexClick(q, r);
                 }
               }}
-              onHexRotate={handleRotate}
+              onHexRotate={(q, r) => { resetHintTimer(); handleRotate(q, r); }}
               hasDuplicates={hasDuplicates}
               rotationAngles={rotationAngles}
               rotatingOrbit={rotatingOrbit}
@@ -201,6 +202,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
               onHexHover={setHoveredHex}
               getOrbitSum={getOrbitSum}
               hintKeys={hintKeys}
+              focusedCenter={focusedCenter}
             />
           </div>
         </div>
