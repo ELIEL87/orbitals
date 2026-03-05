@@ -111,23 +111,12 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
 
   const handleNumberInput = useCallback((number) => {
     if (!selectedHex) return;
-    
+
     const key = `${selectedHex.q},${selectedHex.r}`;
     const hex = grid[key];
-    
+
     if (!hex || hex.isCenter || !hex.orbitCenters || hex.orbitCenters.length === 0) return;
-    
-    // Check if number already exists in any of the orbits this hex belongs to
-    if (number !== null) {
-      const numberExists = hex.orbitCenters.some(orbitCenter => 
-        isNumberInOrbit(orbitCenter, number, key)
-      );
-      if (numberExists) {
-        // Number already exists in one of the orbits, don't allow it
-        return;
-      }
-    }
-    
+
     setGrid(prev => ({
       ...prev,
       [key]: {
@@ -135,7 +124,20 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
         value: number,
       },
     }));
-  }, [selectedHex, grid, isNumberInOrbit]);
+  }, [selectedHex, grid]);
+
+  const swapHexValues = useCallback((keyA, keyB) => {
+    setGrid(prev => {
+      const hexA = prev[keyA];
+      const hexB = prev[keyB];
+      if (!hexA || !hexB || hexA.isCenter || hexB.isCenter || hexA.isBlack || hexB.isBlack) return prev;
+      return {
+        ...prev,
+        [keyA]: { ...hexA, value: hexB.value },
+        [keyB]: { ...hexB, value: hexA.value },
+      };
+    });
+  }, []);
 
   const handleRotate = useCallback((q, r) => {
     const key = `${q},${r}`;
@@ -399,34 +401,8 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
 
   // Get available numbers for selected hex (numbers not in any of its orbits)
   const getAvailableNumbers = useCallback(() => {
-    if (!selectedHex) return [];
-    const key = `${selectedHex.q},${selectedHex.r}`;
-    const hex = grid[key];
-    if (!hex || !hex.orbitCenters || hex.orbitCenters.length === 0) {
-      return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    }
-    
-    // Collect all used numbers from all orbits this hex belongs to (excluding black hexagons)
-    const usedNumbers = new Set();
-    hex.orbitCenters.forEach(orbitCenter => {
-      const orbit1 = getOrbit(orbitCenter.q, orbitCenter.r, 1);
-      orbit1.forEach(h => {
-        const k = `${h.q},${h.r}`;
-        if (k !== key) {
-          const hexData = grid[k];
-          // Skip black hexagons and centers
-          if (hexData && !hexData.isBlack && !hexData.isCenter) {
-            const value = hexData.value;
-            if (value !== null) {
-              usedNumbers.add(value);
-            }
-          }
-        }
-      });
-    });
-    
-    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter(n => !usedNumbers.has(n));
-  }, [selectedHex, grid]);
+    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  }, []);
 
   // Get all playable hexagons (non-center, non-black hexagons) for navigation
   const getPlayableHexagons = useCallback(() => {
@@ -512,6 +488,7 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     checkWin,
     isComplete,
     getAvailableNumbers,
+    swapHexValues,
     hasDuplicates,
     rotationAngles,
     rotatingOrbit,

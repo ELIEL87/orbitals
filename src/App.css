@@ -376,6 +376,17 @@ body {
   color: white;
 }
 
+.clear-btn.flip-active {
+  background: #5B8FA8;
+  color: white;
+  border-color: #5B8FA8;
+}
+
+.clear-btn.flip-active:hover {
+  background: #4a7a93;
+  border-color: #4a7a93;
+}
+
 .clear-all-btn {
   width: 100%;
   padding: 10px;
