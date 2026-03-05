@@ -60,6 +60,17 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
         return;
       }
 
+      if (e.key === ' ') {
+        if (selectedHex) {
+          const hex = grid[`${selectedHex.q},${selectedHex.r}`];
+          if (hex?.isCenter) {
+            handleRotate(selectedHex.q, selectedHex.r);
+          }
+        }
+        e.preventDefault();
+        return;
+      }
+
       if (e.key === 'Escape') {
         setFlipMode(false);
         setFlipSource(null);
@@ -111,7 +122,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedHex, handleNumberInput, navigateHex]);
+  }, [selectedHex, handleNumberInput, navigateHex, handleRotate, grid]);
 
   return (
     <>

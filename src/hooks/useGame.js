@@ -408,7 +408,16 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
   const getPlayableHexagons = useCallback(() => {
     const playableHexes = [];
     const hexSet = new Set();
-    
+
+    // Include center hexagons so keyboard navigation can reach them for rotation
+    centers.forEach(center => {
+      const key = `${center.q},${center.r}`;
+      if (!hexSet.has(key)) {
+        hexSet.add(key);
+        playableHexes.push(center);
+      }
+    });
+
     centers.forEach(center => {
       const orbit1 = getOrbit(center.q, center.r, 1);
       orbit1.forEach(hex => {
@@ -421,7 +430,7 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
         }
       });
     });
-    
+
     return playableHexes;
   }, [centers, grid]);
 
