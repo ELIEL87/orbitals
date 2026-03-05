@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import HexagonGrid from './HexagonGrid';
 import { useGame } from '../hooks/useGame';
 
@@ -20,6 +20,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
     checkWin,
     getAvailableNumbers,
     swapHexValues,
+    getHintHexKeys,
     hasDuplicates,
     rotationAngles,
     rotatingOrbit,
@@ -33,6 +34,17 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
   const [gameWon, setGameWon] = useState(false);
   const [flipMode, setFlipMode] = useState(false);
   const [flipSource, setFlipSource] = useState(null);
+  const [hintKeys, setHintKeys] = useState(new Set());
+  const hintTimerRef = useRef(null);
+
+  const resetHintTimer = useCallback(() => {
+    setHintKeys(new Set());
+    if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+    hintTimerRef.current = setTimeout(() => {
+      const keys = getHintHexKeys();
+      if (keys) setHintKeys(keys);
+    }, 8000);
+  }, [getHintHexKeys]);
   const handleNativeShare = useCallback(() => {
     navigator.share({
       title: 'OrbitalShift',
@@ -50,7 +62,20 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
     if (won && onWin) {
       onWin();
     }
+    if (won) {
+      if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+      setHintKeys(new Set());
+    }
   }, [checkWin, grid, onWin]);
+
+  // Start hint timer when grid is ready
+  useEffect(() => {
+    if (Object.keys(grid).length > 0 && !gameWon) {
+      resetHintTimer();
+    }
+    return () => { if (hintTimerRef.current) clearTimeout(hintTimerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Persist daily grid to localStorage on every change
   useEffect(() => {
@@ -127,9 +152,14 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedHex, handleNumberInput, navigateHex, handleRotate, grid]);
+    const handleKeyDownWithReset = (e) => {
+      resetHintTimer();
+      handleKeyDown(e);
+    };
+
+    window.addEventListener('keydown', handleKeyDownWithReset);
+    return () => window.removeEventListener('keydown', handleKeyDownWithReset);
+  }, [selectedHex, handleNumberInput, navigateHex, handleRotate, grid, resetHintTimer]);
 
   return (
     <>
@@ -148,6 +178,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
               centers={gameCenters}
               selectedHex={selectedHex}
               onHexClick={(q, r) => {
+                resetHintTimer();
                 if (flipMode && flipSource) {
                   const srcKey = `${flipSource.q},${flipSource.r}`;
                   const dstKey = `${q},${r}`;
@@ -169,6 +200,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
               hoveredHex={hoveredHex}
               onHexHover={setHoveredHex}
               getOrbitSum={getOrbitSum}
+              hintKeys={hintKeys}
             />
           </div>
         </div>

@@ -18,6 +18,7 @@ export default function Hexagon({
   isRotating = false,
   orbitCenterPos = null,
   rotationAngle = 0,
+  isHinted = false,
   onClick,
   onRotate,
   onHover,
@@ -202,12 +203,12 @@ export default function Hexagon({
       {isRotating && rotationOffset ? (
         // Animated rotation: orbit around center, counter-rotate content to stay upright
         <g transform={`translate(${orbitCenterPos.x}, ${orbitCenterPos.y}) rotate(${rotationAngle}) translate(${rotationOffset.dx}, ${rotationOffset.dy}) rotate(${-rotationAngle})`}>
-          {renderContent()}
+          <g className={isHinted ? 'hex-rumble' : ''}>{renderContent()}</g>
         </g>
       ) : (
         // Normal static position
         <g transform={`translate(${x}, ${y})`}>
-          {renderContent()}
+          <g className={isHinted ? 'hex-rumble' : ''}>{renderContent()}</g>
         </g>
       )}
     </g>

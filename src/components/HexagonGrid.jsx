@@ -16,6 +16,7 @@ export default function HexagonGrid({
   hoveredHex = null,
   onHexHover,
   getOrbitSum,
+  hintKeys = new Set(),
 }) {
   const allHexes = useMemo(() => {
     const hexes = new Set();
@@ -178,6 +179,7 @@ export default function HexagonGrid({
         const remainingSum = isCenter && getOrbitSum
           ? value - getOrbitSum({ q: hex.q, r: hex.r })
           : null;
+        const isHinted = hintKeys.has(key);
 
         return (
           <Hexagon
@@ -199,6 +201,7 @@ export default function HexagonGrid({
             orbitCenterPos={orbitCenterPos}
             rotationAngle={rotationAngles[key] || 0}
             rotation={rotation}
+            isHinted={isHinted}
             onClick={onHexClick}
             onRotate={onHexRotate}
             onHover={onHexHover}

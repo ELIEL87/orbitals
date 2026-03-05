@@ -485,6 +485,41 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     }
   }, [selectedHex, getPlayableHexagons]);
 
+  // Returns hex keys to hint after idle timeout.
+  // Priority 1: hexes with duplicate values in an orbit.
+  // Priority 2: center hexes of orbits that aren't solved yet.
+  const getHintHexKeys = useCallback(() => {
+    const duplicateKeys = new Set();
+    centers.forEach(center => {
+      if (hasDuplicates(center)) {
+        const orbit1 = getOrbit(center.q, center.r, 1);
+        const valueBuckets = {};
+        orbit1.forEach(h => {
+          const k = `${h.q},${h.r}`;
+          const hexData = grid[k];
+          if (hexData && !hexData.isBlack && !hexData.isCenter && hexData.value !== null) {
+            if (!valueBuckets[hexData.value]) valueBuckets[hexData.value] = [];
+            valueBuckets[hexData.value].push(k);
+          }
+        });
+        Object.values(valueBuckets).forEach(keys => {
+          if (keys.length > 1) keys.forEach(k => duplicateKeys.add(k));
+        });
+      }
+    });
+    if (duplicateKeys.size > 0) return duplicateKeys;
+
+    const incorrectCenterKeys = new Set();
+    centers.forEach(center => {
+      if (!isOrbitCorrect(center)) {
+        incorrectCenterKeys.add(`${center.q},${center.r}`);
+      }
+    });
+    if (incorrectCenterKeys.size > 0) return incorrectCenterKeys;
+
+    return null;
+  }, [centers, grid, hasDuplicates, isOrbitCorrect]);
+
   return {
     grid,
     selectedHex,
@@ -498,6 +533,7 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     isComplete,
     getAvailableNumbers,
     swapHexValues,
+    getHintHexKeys,
     hasDuplicates,
     rotationAngles,
     rotatingOrbit,
