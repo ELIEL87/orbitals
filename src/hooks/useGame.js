@@ -498,7 +498,7 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
 
   // Returns hex keys to hint after idle timeout.
   // Priority 1: hexes with duplicate values in an orbit.
-  // Priority 2: center hexes of orbits that aren't solved yet.
+  // Priority 2: all hexes in orbits that are complete but have the wrong sum.
   const getHintHexKeys = useCallback(() => {
     const duplicateKeys = new Set();
     centers.forEach(center => {
@@ -520,16 +520,23 @@ export function useGame(initialCenters = [], blackHexagons = [], initialGrid = n
     });
     if (duplicateKeys.size > 0) return duplicateKeys;
 
-    const incorrectCenterKeys = new Set();
+    const incorrectHexKeys = new Set();
     centers.forEach(center => {
-      if (!isOrbitCorrect(center)) {
-        incorrectCenterKeys.add(`${center.q},${center.r}`);
+      if (isOrbitIncorrect(center)) {
+        const orbit1 = getOrbit(center.q, center.r, 1);
+        orbit1.forEach(h => {
+          const k = `${h.q},${h.r}`;
+          const hexData = grid[k];
+          if (hexData && !hexData.isBlack && !hexData.isCenter) {
+            incorrectHexKeys.add(k);
+          }
+        });
       }
     });
-    if (incorrectCenterKeys.size > 0) return incorrectCenterKeys;
+    if (incorrectHexKeys.size > 0) return incorrectHexKeys;
 
     return null;
-  }, [centers, grid, hasDuplicates, isOrbitCorrect]);
+  }, [centers, grid, hasDuplicates, isOrbitIncorrect]);
 
   return {
     grid,
