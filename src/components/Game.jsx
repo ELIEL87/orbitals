@@ -33,28 +33,12 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
   const [gameWon, setGameWon] = useState(false);
   const [flipMode, setFlipMode] = useState(false);
   const [flipSource, setFlipSource] = useState(null);
-  const [copied, setCopied] = useState(false);
-
-  const shareText = mode === 'daily'
-    ? `I solved today's Orbitals puzzle! 🎯`
-    : `I solved an Orbitals puzzle! 🎯`;
-  const shareUrl = window.location.href;
-
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [shareText, shareUrl]);
-
-  const handleTwitterShare = useCallback(() => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }, [shareText, shareUrl]);
-
   const handleNativeShare = useCallback(() => {
-    navigator.share({ title: 'Orbitals', text: shareText, url: shareUrl });
-  }, [shareText, shareUrl]);
+    navigator.share({
+      title: 'OrbitalShift',
+      text: 'Numbers and a little chaos 🎯 Try OrbitalShift → orbitalshiftgame.com',
+    });
+  }, []);
 
   useEffect(() => {
     initializeGrid();
@@ -195,19 +179,13 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
               <div className="solved-title">Solved!</div>
               <p className="solved-subtitle">All orbits complete</p>
 
-              <div className="share-buttons">
-                <button className="share-btn share-btn-copy" onClick={handleCopy}>
-                  {copied ? '✓ Copied!' : '⎘ Copy'}
-                </button>
-                <button className="share-btn share-btn-twitter" onClick={handleTwitterShare}>
-                  𝕏 Share
-                </button>
-                {typeof navigator.share === 'function' && (
+              {typeof navigator.share === 'function' && (
+                <div className="share-buttons">
                   <button className="share-btn share-btn-native" onClick={handleNativeShare}>
-                    ↑ Share
+                    Share
                   </button>
-                )}
-              </div>
+                </div>
+              )}
 
               {mode === 'daily' && onContinueFreePlay && (
                 <button className="win-modal-btn" onClick={onContinueFreePlay}>
