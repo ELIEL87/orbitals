@@ -60,7 +60,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
         return;
       }
 
-      if (e.key === ' ') {
+      if (e.key === ' ' || e.key === 'Enter') {
         if (selectedHex) {
           const hex = grid[`${selectedHex.q},${selectedHex.r}`];
           if (hex?.isCenter) {
