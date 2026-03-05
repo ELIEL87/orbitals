@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { HEX_SIZE } from '../utils/hexagon';
 
-export default function Hexagon({ 
-  q, 
-  r, 
-  x, 
-  y, 
-  value, 
-  isCenter, 
+export default function Hexagon({
+  q,
+  r,
+  x,
+  y,
+  value,
+  remainingSum = null,
+  isCenter,
   isSelected,
   isBlack = false,
   hasDuplicate = false,
@@ -20,7 +21,7 @@ export default function Hexagon({
   onClick,
   onRotate,
   onHover,
-  rotation = 0 
+  rotation = 0,
 }) {
   const points = useMemo(() => {
     const points = [];
@@ -119,20 +120,62 @@ export default function Hexagon({
         }
         className={isRotating ? 'rotating-polygon' : ''}
       />
-      {value !== null && !isBlack && (
+      {value !== null && !isBlack && !isCenter && (
         <text
           x="0"
           y="0"
           textAnchor="middle"
           dominantBaseline="middle"
-          fontSize={isCenter ? 24 : 18}
-          fontWeight={isCenter ? 'bold' : 'normal'}
-          fill={isCenter ? '#fff' : '#4A4238'}
+          fontSize={18}
+          fill="#4A4238"
           className={isRotating ? 'rotating-text' : ''}
         >
           {value}
         </text>
       )}
+      {isCenter && value !== null && (() => {
+        const showRemaining = remainingSum !== null && remainingSum !== value;
+        return showRemaining ? (
+          <>
+            <text
+              x="0"
+              y={-HEX_SIZE * 0.15}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={20}
+              fontWeight="bold"
+              fill="#fff"
+              className={isRotating ? 'rotating-text' : ''}
+            >
+              {remainingSum}
+            </text>
+            <text
+              x="0"
+              y={HEX_SIZE * 0.25}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={11}
+              fill="#fff"
+              opacity={0.7}
+            >
+              /{value}
+            </text>
+          </>
+        ) : (
+          <text
+            x="0"
+            y="0"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize={24}
+            fontWeight="bold"
+            fill="#fff"
+            className={isRotating ? 'rotating-text' : ''}
+          >
+            {value}
+          </text>
+        );
+      })()}
       {isCenter && (
         <text
           x="0"

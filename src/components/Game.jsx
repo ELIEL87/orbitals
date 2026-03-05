@@ -25,6 +25,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
     rotatingOrbit,
     isOrbitIncorrect,
     isOrbitCorrect,
+    getOrbitSum,
     navigateHex,
   } = useGame(centers, blackHexagons, initialGrid);
 
@@ -161,6 +162,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
               isOrbitCorrect={isOrbitCorrect}
               hoveredHex={hoveredHex}
               onHexHover={setHoveredHex}
+              getOrbitSum={getOrbitSum}
             />
           </div>
         </div>

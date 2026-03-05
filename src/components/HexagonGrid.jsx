@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import Hexagon from './Hexagon';
 import { hexToPixel, getOrbit, hexDistance } from '../utils/hexagon';
 
-export default function HexagonGrid({ 
-  grid, 
-  centers, 
-  selectedHex, 
-  onHexClick, 
+export default function HexagonGrid({
+  grid,
+  centers,
+  selectedHex,
+  onHexClick,
   onHexRotate,
   hasDuplicates,
   rotationAngles = {},
@@ -14,7 +14,8 @@ export default function HexagonGrid({
   isOrbitIncorrect,
   isOrbitCorrect,
   hoveredHex = null,
-  onHexHover
+  onHexHover,
+  getOrbitSum,
 }) {
   const allHexes = useMemo(() => {
     const hexes = new Set();
@@ -174,6 +175,10 @@ export default function HexagonGrid({
           }
         }
         
+        const remainingSum = isCenter && getOrbitSum
+          ? value - getOrbitSum({ q: hex.q, r: hex.r })
+          : null;
+
         return (
           <Hexagon
             key={key}
@@ -182,6 +187,7 @@ export default function HexagonGrid({
             x={x}
             y={y}
             value={value}
+            remainingSum={remainingSum}
             isCenter={isCenter}
             isBlack={isBlack}
             isSelected={isSelected}
