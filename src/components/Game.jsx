@@ -136,6 +136,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
         ArrowRight: 'right',
       };
       if (arrowMap[e.key]) {
+        setHoveredHex(null);
         navigateHex(arrowMap[e.key]);
         e.preventDefault();
         return;
