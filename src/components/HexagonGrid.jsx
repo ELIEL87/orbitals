@@ -177,8 +177,8 @@ export default function HexagonGrid({
           }
         }
         
-        const remainingSum = isCenter && getOrbitSum
-          ? value - getOrbitSum({ q: hex.q, r: hex.r })
+        const currentSum = isCenter && getOrbitSum
+          ? getOrbitSum({ q: hex.q, r: hex.r })
           : null;
         const isHinted = hintKeys.has(key);
         const isCenterFocused = isCenter && focusedCenter?.q === hex.q && focusedCenter?.r === hex.r;
@@ -191,7 +191,7 @@ export default function HexagonGrid({
             x={x}
             y={y}
             value={value}
-            remainingSum={remainingSum}
+            currentSum={currentSum}
             isCenter={isCenter}
             isBlack={isBlack}
             isSelected={isSelected}

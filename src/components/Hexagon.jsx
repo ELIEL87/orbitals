@@ -7,7 +7,7 @@ export default function Hexagon({
   x,
   y,
   value,
-  remainingSum = null,
+  currentSum = null,
   isCenter,
   isSelected,
   isBlack = false,
@@ -142,8 +142,8 @@ export default function Hexagon({
         </text>
       )}
       {isCenter && value !== null && (() => {
-        const showRemaining = remainingSum !== null && remainingSum !== value;
-        return showRemaining ? (
+        const showCurrent = currentSum !== null && currentSum !== value;
+        return showCurrent ? (
           <>
             <text
               x="0"
@@ -155,7 +155,7 @@ export default function Hexagon({
               fill="#fff"
               className={isRotating ? 'rotating-text' : ''}
             >
-              {remainingSum}
+              {value}
             </text>
             <text
               x="0"
@@ -166,7 +166,7 @@ export default function Hexagon({
               fill="#fff"
               opacity={0.7}
             >
-              /{value}
+              {currentSum}
             </text>
           </>
         ) : (
