@@ -94,7 +94,9 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
       }
 
       if (e.key === ' ' || e.key === 'Enter') {
-        if (selectedHex) {
+        if (focusedCenter) {
+          handleRotate(focusedCenter.q, focusedCenter.r);
+        } else if (selectedHex) {
           const hex = grid[`${selectedHex.q},${selectedHex.r}`];
           if (hex?.isCenter) {
             handleRotate(selectedHex.q, selectedHex.r);
@@ -160,7 +162,7 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
 
     window.addEventListener('keydown', handleKeyDownWithReset);
     return () => window.removeEventListener('keydown', handleKeyDownWithReset);
-  }, [selectedHex, handleNumberInput, navigateHex, handleRotate, grid, resetHintTimer]);
+  }, [selectedHex, focusedCenter, handleNumberInput, navigateHex, handleRotate, grid, resetHintTimer]);
 
   return (
     <>
