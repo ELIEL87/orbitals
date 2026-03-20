@@ -62,16 +62,10 @@ function Tutorial({ onBack, onFinish }) {
         centers={puzzle.centers}
         blackHexagons={puzzle.blackHexagons}
         onWin={handleWin}
+        onNextLevel={stepWon ? handleNext : undefined}
+        nextLevelLabel={step < 2 ? 'Next Level' : 'Start Playing'}
         hideInstructions
       />
-
-      {stepWon && (
-        <div className="tutorial-nav">
-          <button className="tutorial-nav-btn" onClick={handleNext}>
-            {step < 2 ? 'Next Level' : 'Start Playing'}
-          </button>
-        </div>
-      )}
     </div>
   );
 }

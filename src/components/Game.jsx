@@ -7,7 +7,7 @@ function getTodayString() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPuzzle, initialGrid }) {
+function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPuzzle, initialGrid, onNextLevel, nextLevelLabel }) {
   const {
     grid,
     selectedHex,
@@ -216,12 +216,18 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
               <div className="solved-title">Solved!</div>
               <p className="solved-subtitle">All orbits complete</p>
 
-              {typeof navigator.share === 'function' && (
-                <div className="share-buttons">
-                  <button className="share-btn share-btn-native" onClick={handleNativeShare}>
-                    Share
-                  </button>
-                </div>
+              {onNextLevel ? (
+                <button className="win-modal-btn" onClick={onNextLevel}>
+                  {nextLevelLabel || 'Next Level'}
+                </button>
+              ) : (
+                typeof navigator.share === 'function' && (
+                  <div className="share-buttons">
+                    <button className="share-btn share-btn-native" onClick={handleNativeShare}>
+                      Share
+                    </button>
+                  </div>
+                )
               )}
 
               {mode === 'daily' && onContinueFreePlay && (
