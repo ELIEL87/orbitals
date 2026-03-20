@@ -217,26 +217,24 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
               <p className="solved-subtitle">All orbits complete</p>
 
               {onNextLevel ? (
-                <button className="win-modal-btn" onClick={onNextLevel}>
+                <button className="solved-btn" onClick={onNextLevel}>
                   {nextLevelLabel || 'Next Level'}
                 </button>
               ) : (
                 typeof navigator.share === 'function' && (
-                  <div className="share-buttons">
-                    <button className="share-btn share-btn-native" onClick={handleNativeShare}>
-                      Share
-                    </button>
-                  </div>
+                  <button className="solved-btn" onClick={handleNativeShare}>
+                    Share
+                  </button>
                 )
               )}
 
               {mode === 'daily' && onContinueFreePlay && (
-                <button className="win-modal-btn" onClick={onContinueFreePlay}>
+                <button className="solved-btn" onClick={onContinueFreePlay}>
                   Continue in Free Play
                 </button>
               )}
               {mode !== 'daily' && onNewPuzzle && (
-                <button className="win-modal-btn" onClick={onNewPuzzle}>
+                <button className="solved-btn" onClick={onNewPuzzle}>
                   New Puzzle
                 </button>
               )}

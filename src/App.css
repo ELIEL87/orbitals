@@ -439,44 +439,7 @@ body {
   margin: 0;
 }
 
-.share-buttons {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-}
-
-.share-btn {
-  flex: 1;
-  padding: 10px 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.1s;
-}
-
-.share-btn:hover {
-  opacity: 0.85;
-  transform: translateY(-1px);
-}
-
-.share-btn-copy {
-  background: #e8f4f0;
-  color: #508484;
-}
-
-.share-btn-twitter {
-  background: #000;
-  color: #fff;
-}
-
-.share-btn-native {
-  background: #508484;
-  color: #fff;
-}
-
-.win-modal-btn {
+.solved-btn {
   width: 100%;
   padding: 14px;
   font-size: 1rem;
@@ -489,7 +452,7 @@ body {
   transition: opacity 0.2s;
 }
 
-.win-modal-btn:hover {
+.solved-btn:hover {
   opacity: 0.85;
 }
 
