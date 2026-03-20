@@ -150,7 +150,7 @@ export default function Hexagon({
               y={-HEX_SIZE * 0.15}
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize={20}
+              fontSize={24}
               fontWeight="bold"
               fill="#fff"
               className={isRotating ? 'rotating-text' : ''}
@@ -162,7 +162,7 @@ export default function Hexagon({
               y={HEX_SIZE * 0.25}
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize={11}
+              fontSize={13}
               fill="#fff"
               opacity={0.7}
             >
@@ -175,7 +175,7 @@ export default function Hexagon({
             y="0"
             textAnchor="middle"
             dominantBaseline="middle"
-            fontSize={24}
+            fontSize={28}
             fontWeight="bold"
             fill="#fff"
             className={isRotating ? 'rotating-text' : ''}
@@ -189,7 +189,7 @@ export default function Hexagon({
           x="0"
           y={HEX_SIZE * 0.6}
           textAnchor="middle"
-          fontSize={12}
+          fontSize={15}
           fill="#fff"
           opacity={0.8}
         >

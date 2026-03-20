@@ -1,5 +1,5 @@
 // Hexagon grid utilities
-export const HEX_SIZE = 40; // Size of hexagon (radius)
+export const HEX_SIZE = 50; // Size of hexagon (radius)
 export const HEX_WIDTH = HEX_SIZE * 2;
 export const HEX_HEIGHT = Math.sqrt(3) * HEX_SIZE;
 
