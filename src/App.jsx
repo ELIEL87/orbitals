@@ -161,7 +161,14 @@ function App() {
               <li>Each number can only appear once per orbit</li>
               <li>Tap a center hexagon to rotate its orbit</li>
               <li>The sum of numbers in each orbit must equal the center number</li>
+              <li>Black hexagons block number slots — rotate orbits to move them where needed</li>
             </ul>
+            <button
+              className="help-modal-tutorial-link"
+              onClick={() => { setHelpOpen(false); setPage('tutorial'); }}
+            >
+              Step-by-step tutorial →
+            </button>
           </div>
         </div>
       )}
