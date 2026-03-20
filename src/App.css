@@ -506,6 +506,7 @@ body {
 .hexagon.selected polygon {
   stroke: #4A4238 !important;
   stroke-width: 4 !important;
+  opacity: 1 !important;
 }
 
 .hexagon.center polygon {

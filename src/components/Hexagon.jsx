@@ -92,10 +92,10 @@ export default function Hexagon({
             ? '#508484'
             : hasDuplicate
             ? '#f5e6e6'
-            : isHighlighted
-            ? '#6BA3D1'
             : isSelected
             ? '#79C99E'
+            : isHighlighted
+            ? '#6BA3D1'
             : '#f0f0f0'
         }
         stroke={
