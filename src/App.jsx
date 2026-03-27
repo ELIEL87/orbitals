@@ -7,6 +7,7 @@ import orbitsLogo from './assets/orbits_white.svg';
 import './App.css';
 
 const DAILY_STORAGE_KEY = 'orbital-daily-completed';
+const STREAK_KEY = 'orbital-daily-streak';
 
 function getTodayString() {
   const d = new Date();
@@ -16,12 +17,53 @@ function getTodayString() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+function getYesterdayString() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function formatTime(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
 function isDailyCompleted() {
   return localStorage.getItem(DAILY_STORAGE_KEY) === getTodayString();
 }
 
+function getDailyStreak() {
+  try {
+    const saved = localStorage.getItem(STREAK_KEY);
+    return saved ? JSON.parse(saved) : { count: 0, lastDate: null };
+  } catch {
+    return { count: 0, lastDate: null };
+  }
+}
+
+function updateStreak() {
+  const today = getTodayString();
+  const streak = getDailyStreak();
+  if (streak.lastDate === today) return;
+  const newCount = streak.lastDate === getYesterdayString() ? streak.count + 1 : 1;
+  localStorage.setItem(STREAK_KEY, JSON.stringify({ count: newCount, lastDate: today }));
+}
+
+function getDailySolveTime() {
+  try {
+    const saved = localStorage.getItem(`orbital-daily-timer-${getTodayString()}`);
+    return saved ? parseInt(saved, 10) : null;
+  } catch {
+    return null;
+  }
+}
+
 function markDailyCompleted() {
   localStorage.setItem(DAILY_STORAGE_KEY, getTodayString());
+  updateStreak();
 }
 
 function loadDailyGrid() {
@@ -79,6 +121,8 @@ function App() {
 
   if (page === 'landing') {
     const dailyDone = isDailyCompleted();
+    const solveTime = dailyDone ? getDailySolveTime() : null;
+    const streak = getDailyStreak();
     return (
       <div className="landing-page">
         <img src={orbitsLogo} alt="Orbital Shift" className="landing-logo" />
@@ -97,6 +141,13 @@ function App() {
             Free Play
           </button>
         </div>
+        {dailyDone && (
+          <div className="daily-stats">
+            {solveTime != null && <span>{formatTime(solveTime)}</span>}
+            {solveTime != null && streak.count > 0 && <span className="daily-stats-sep">·</span>}
+            {streak.count > 0 && <span>{streak.count} day streak</span>}
+          </div>
+        )}
         <button
           className="landing-how-to-play"
           onClick={() => setPage('tutorial')}
