@@ -439,6 +439,25 @@ body {
   margin: 0;
 }
 
+.daily-timer {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #508484;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.solved-time {
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #79C99E;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
 .solved-btn {
   width: 100%;
   padding: 14px;

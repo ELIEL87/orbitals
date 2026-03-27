@@ -7,7 +7,19 @@ function getTodayString() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+function formatTime(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) {
+    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
 function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPuzzle, initialGrid, onNextLevel, nextLevelLabel }) {
+  const dailyTimerKey = mode === 'daily' ? `orbital-daily-timer-${getTodayString()}` : null;
+
   const {
     grid,
     selectedHex,
@@ -37,6 +49,14 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
   const [flipSource, setFlipSource] = useState(null);
   const [hintKeys, setHintKeys] = useState(new Set());
   const hintTimerRef = useRef(null);
+  const timerRef = useRef(null);
+  const [elapsed, setElapsed] = useState(() => {
+    if (mode === 'daily' && dailyTimerKey) {
+      const saved = localStorage.getItem(dailyTimerKey);
+      return saved ? parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
 
   const resetHintTimer = useCallback(() => {
     setHintKeys(new Set());
@@ -47,11 +67,11 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
     }, 8000);
   }, [getHintHexKeys]);
   const handleNativeShare = useCallback(() => {
-    navigator.share({
-      title: 'OrbitalShift',
-      text: 'Numbers and a little chaos 🎯 Try OrbitalShift → orbitalshiftgame.com',
-    });
-  }, []);
+    const text = gameWon && mode === 'daily'
+      ? `I solved today's Orbital Shift in ${formatTime(elapsed)} ⏱ Can you beat it? → orbitalshiftgame.com`
+      : 'Numbers and orbits — can you crack it? Try Orbital Shift → orbitalshiftgame.com';
+    navigator.share({ title: 'OrbitalShift', text });
+  }, [gameWon, mode, elapsed]);
 
   useEffect(() => {
     initializeGrid();
@@ -77,6 +97,23 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
     return () => { if (hintTimerRef.current) clearTimeout(hintTimerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Daily challenge timer
+  useEffect(() => {
+    if (mode !== 'daily' || gameWon) {
+      clearInterval(timerRef.current);
+      return;
+    }
+    timerRef.current = setInterval(() => {
+      setElapsed(prev => {
+        const next = prev + 1;
+        if (dailyTimerKey) localStorage.setItem(dailyTimerKey, String(next));
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, gameWon]);
 
   // Persist daily grid to localStorage on every change
   useEffect(() => {
@@ -211,9 +248,15 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
         </div>
 
         <div className="game-controls">
+          {mode === 'daily' && !gameWon && (
+            <div className="daily-timer">{formatTime(elapsed)}</div>
+          )}
           {gameWon ? (
             <div className="solved-panel">
               <div className="solved-title">Solved!</div>
+              {mode === 'daily' && (
+                <div className="solved-time">{formatTime(elapsed)}</div>
+              )}
               <p className="solved-subtitle">All orbits complete</p>
 
               {onNextLevel ? (
