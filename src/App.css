@@ -742,9 +742,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  padding: 20px;
+  padding: clamp(32px, 8vh, 80px) 20px 48px;
 }
 
 .landing-logo {
@@ -957,4 +956,205 @@ body {
     width: 100%;
     max-width: 260px;
   }
+}
+
+/* Leaderboard */
+.leaderboard {
+  margin-top: 36px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.leaderboard-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.leaderboard-loading {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.9rem;
+}
+
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+}
+
+.leaderboard-row--first {
+  background: rgba(121, 201, 158, 0.15);
+  border: 1px solid rgba(121, 201, 158, 0.3);
+}
+
+.lb-rank {
+  width: 20px;
+  text-align: center;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.leaderboard-row--first .lb-rank {
+  color: #79C99E;
+}
+
+.lb-name {
+  flex: 1;
+  color: rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.leaderboard-row--first .lb-time {
+  color: #79C99E;
+}
+
+/* Score submit button in solved panel */
+.score-submit-btn {
+  padding: 10px 16px !important;
+  white-space: nowrap;
+}
+
+.score-submit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.score-submit-success {
+  font-size: 0.9rem;
+  color: #79C99E;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Leaderboard submit dialog */
+.submit-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.submit-modal {
+  background: #f8f8f8;
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.submit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.submit-modal-header h2 {
+  color: #4A4238;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.submit-modal-time {
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #79C99E;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.submit-modal-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #ddd;
+  background: white;
+  color: #2a2a2a;
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.submit-modal-input::placeholder {
+  color: #aaa;
+}
+
+.submit-modal-input:focus {
+  border-color: #508484;
+}
+
+.submit-modal-btn {
+  width: 100%;
+  padding: 13px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #508484;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.submit-modal-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.submit-modal-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.submit-modal-success {
+  font-size: 1.1rem;
+  color: #508484;
+  text-align: center;
+  font-weight: 700;
+}
+
+.submit-modal-error {
+  font-size: 0.85rem;
+  color: #c44;
+  text-align: center;
+  margin: 0;
 }

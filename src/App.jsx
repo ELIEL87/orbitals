@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import Game from './components/Game';
 import Tutorial from './components/Tutorial';
 import ModeSelector from './components/ModeSelector';
+import Leaderboard from './components/Leaderboard';
 import { generateDailyPuzzle, generateFreePlayPuzzle } from './utils/puzzleGenerator';
 import orbitsLogo from './assets/orbits_white.svg';
 import './App.css';
@@ -81,6 +82,7 @@ function App() {
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [page, setPage] = useState('landing');
   const [helpOpen, setHelpOpen] = useState(false);
+  const [leaderboardKey, setLeaderboardKey] = useState(0);
 
   const generatePuzzle = useCallback((currentMode, currentDifficulty) => {
     if (currentMode === 'daily') {
@@ -154,6 +156,7 @@ function App() {
         >
           How to Play
         </button>
+        <Leaderboard date={getTodayString()} refreshKey={leaderboardKey} />
       </div>
     );
   }
@@ -175,7 +178,7 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <button className="header-back" onClick={() => setPage('landing')}>← Back</button>
+        <button className="header-back" onClick={() => { setPage('landing'); setLeaderboardKey(k => k + 1); }}>← Back</button>
         <h1 className="header-title">Orbital Shift</h1>
         <button className="header-help" onClick={() => setHelpOpen(true)}>?</button>
       </header>

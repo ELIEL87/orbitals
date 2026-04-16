@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import HexagonGrid from './HexagonGrid';
 import { useGame } from '../hooks/useGame';
+import { supabase } from '../lib/supabase';
 
 function getTodayString() {
   const d = new Date();
@@ -45,6 +46,12 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
 
   const [hoveredHex, setHoveredHex] = useState(null);
   const [gameWon, setGameWon] = useState(false);
+  const [submitName, setSubmitName] = useState('');
+  const [submitStatus, setSubmitStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const alreadySubmitted = mode === 'daily'
+    ? localStorage.getItem(`orbital-daily-submitted-${getTodayString()}`) === 'true'
+    : false;
   const [flipMode, setFlipMode] = useState(false);
   const [flipSource, setFlipSource] = useState(null);
   const [hintKeys, setHintKeys] = useState(new Set());
@@ -86,6 +93,9 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
     if (won) {
       if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
       setHintKeys(new Set());
+      if (mode === 'daily' && supabase && !alreadySubmitted) {
+        setSubmitOpen(true);
+      }
     }
   }, [checkWin, grid, onWin]);
 
@@ -202,6 +212,23 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
     return () => window.removeEventListener('keydown', handleKeyDownWithReset);
   }, [selectedHex, focusedCenter, handleNumberInput, navigateHex, handleRotate, grid, resetHintTimer]);
 
+  const handleSubmitScore = useCallback(async () => {
+    if (!supabase || !submitName.trim()) return;
+    setSubmitStatus('submitting');
+    const { error } = await supabase.from('daily_leaderboard').insert({
+      date: getTodayString(),
+      name: submitName.trim().slice(0, 20),
+      time_seconds: elapsed,
+    });
+    if (error) {
+      setSubmitStatus('error');
+    } else {
+      localStorage.setItem(`orbital-daily-submitted-${getTodayString()}`, 'true');
+      setSubmitStatus('success');
+      setTimeout(() => setSubmitOpen(false), 1200);
+    }
+  }, [submitName, elapsed]);
+
   return (
     <>
       <div className="game-container">
@@ -258,6 +285,18 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
                 <div className="solved-time">{formatTime(elapsed)}</div>
               )}
               <p className="solved-subtitle">All orbits complete</p>
+
+              {mode === 'daily' && supabase && (
+                submitStatus === 'success' || alreadySubmitted ? (
+                  <p className="score-submit-success">
+                    {submitStatus === 'success' ? 'Score submitted!' : 'Score already on leaderboard'}
+                  </p>
+                ) : (
+                  <button className="solved-btn score-submit-btn" onClick={() => setSubmitOpen(true)}>
+                    Add to Leaderboard
+                  </button>
+                )
+              )}
 
               {onNextLevel ? (
                 <button className="solved-btn" onClick={onNextLevel}>
@@ -342,6 +381,44 @@ function Game({ centers, blackHexagons, onWin, mode, onContinueFreePlay, onNewPu
           )}
         </div>
       </div>
+
+      {submitOpen && (
+        <div className="submit-modal-overlay" onClick={() => setSubmitOpen(false)}>
+          <div className="submit-modal" onClick={e => e.stopPropagation()}>
+            <div className="submit-modal-header">
+              <h2>Add to Leaderboard</h2>
+              <button className="help-modal-close" onClick={() => setSubmitOpen(false)}>×</button>
+            </div>
+            <p className="submit-modal-time">{formatTime(elapsed)}</p>
+            {submitStatus === 'success' ? (
+              <p className="submit-modal-success">Score submitted!</p>
+            ) : (
+              <>
+                <input
+                  className="submit-modal-input"
+                  type="text"
+                  placeholder="Your name"
+                  value={submitName}
+                  onChange={e => setSubmitName(e.target.value.slice(0, 20))}
+                  maxLength={20}
+                  autoFocus
+                  onKeyDown={e => { if (e.key === 'Enter') handleSubmitScore(); }}
+                />
+                {submitStatus === 'error' && (
+                  <p className="submit-modal-error">Failed to submit. Try again.</p>
+                )}
+                <button
+                  className="submit-modal-btn"
+                  onClick={handleSubmitScore}
+                  disabled={!submitName.trim() || submitStatus === 'submitting'}
+                >
+                  {submitStatus === 'submitting' ? 'Submitting…' : 'Submit'}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
     </>
   );
